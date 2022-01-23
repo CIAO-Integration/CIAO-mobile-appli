@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">CIAO</string>
+
+    <string name="news">News</string>
+    <string name="popularization">Popularization</string>
+    <string name="digital">Digital</string>
+    <string name="science">Science</string>
+    <string name="culture">Culture</string>
+    <string name="history">History</string>
+    <string name="geography">Geography</string>
+    <string name="politics">Politics</string>
+    <string name="sport">Sport</string>
+    <string name="browse">Browse</string>
+    <string name="around">Around</string>
+</resources>

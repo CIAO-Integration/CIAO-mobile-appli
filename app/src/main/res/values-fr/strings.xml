@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CIAO</string>
+    <string name="news">Actualités</string>
+    <string name="popularization">Vulgarisation</string>
+    <string name="digital">Numérique</string>
+    <string name="science">Science</string>
+    <string name="culture">Culture</string>
+    <string name="history">Histoire</string>
+    <string name="geography">Géographie</string>
+    <string name="politics">Politique</string>
+    <string name="sport">Sport</string>
+    <string name="browse">Parcourir</string>
+    <string name="around">Autour</string>
+</resources>
