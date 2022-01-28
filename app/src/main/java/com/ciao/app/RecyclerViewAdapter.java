@@ -2,6 +2,8 @@ package com.ciao.app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,18 +31,24 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        View view = layoutInflater.inflate(R.layout.list_item, parent, false);
+        View view = layoutInflater.inflate(R.layout.list_item_main, parent, false);
         RecyclerViewAdapter.ViewHolder viewHolder = new RecyclerViewAdapter.ViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if (data.get(position)[1] != null) {
-            //holder.image.setImageDrawable();
-        }
         holder.title.setText(data.get(position)[2]);
         holder.description.setText(data.get(position)[3]);
+
+        if (data.get(position)[1] != null) {
+            String source = data.get(position)[1];
+            String fileName = source.split("/")[source.split("/").length - 1];
+            Bitmap bitmap = BitmapFactory.decodeFile(context.getCacheDir() + "/" + fileName);
+            if (bitmap != null) {
+                holder.image.setImageBitmap(bitmap);
+            }
+        }
 
         String id = data.get(position)[0];
         holder.card.setOnClickListener(new View.OnClickListener() {

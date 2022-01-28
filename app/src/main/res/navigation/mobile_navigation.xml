@@ -24,41 +24,41 @@
         android:id="@+id/nav_popularization"
         android:name="com.ciao.app.fragment.PopularizationFragment"
         android:label="@string/popularization"
-        tools:layout="@layout/fragment" />
+        tools:layout="@layout/fragment_main" />
 
     <fragment
         android:id="@+id/nav_digital"
         android:name="com.ciao.app.fragment.DigitalFragment"
         android:label="@string/digital"
-        tools:layout="@layout/fragment" />
+        tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_science"
         android:name="com.ciao.app.fragment.ScienceFragment"
         android:label="@string/science"
-        tools:layout="@layout/fragment" />
+        tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_culture"
         android:name="com.ciao.app.fragment.CultureFragment"
         android:label="@string/culture"
-        tools:layout="@layout/fragment" />
+        tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_history"
         android:name="com.ciao.app.fragment.HistoryFragment"
         android:label="@string/history"
-        tools:layout="@layout/fragment" />
+        tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_geography"
         android:name="com.ciao.app.fragment.GeographyFragment"
         android:label="@string/geography"
-        tools:layout="@layout/fragment" />
+        tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_politics"
         android:name="com.ciao.app.fragment.PoliticsFragment"
         android:label="@string/politics"
-        tools:layout="@layout/fragment" />
+        tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_sport"
         android:name="com.ciao.app.fragment.SportFragment"
         android:label="@string/sport"
-        tools:layout="@layout/fragment" />
+        tools:layout="@layout/fragment_main" />
 </navigation>

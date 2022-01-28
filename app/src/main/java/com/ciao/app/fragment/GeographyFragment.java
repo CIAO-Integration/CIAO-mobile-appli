@@ -10,14 +10,14 @@ import androidx.fragment.app.Fragment;
 
 import com.ciao.app.Functions;
 import com.ciao.app.R;
-import com.ciao.app.databinding.FragmentBinding;
+import com.ciao.app.databinding.FragmentMainBinding;
 
 public class GeographyFragment extends Fragment {
 
-    private FragmentBinding binding;
+    private FragmentMainBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentBinding.inflate(inflater, container, false);
+        binding = FragmentMainBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         Functions.initFragment(getContext(), binding, R.string.geography);
