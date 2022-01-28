@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.ciao.app.activity.Main;
 import com.ciao.app.databinding.FragmentMainBinding;
 
 import java.util.ArrayList;
@@ -17,15 +18,16 @@ import java.util.ArrayList;
 public class Functions {
     /**
      * Init a Fragment of Main Activity
+     *
      * @param context Context
      * @param binding Binding to get Views
-     * @param which Which Fragment
+     * @param which   Which Fragment
      */
     public static void initFragment(Context context, FragmentMainBinding binding, int which) {
         ArrayList<String[]> data = getData(which);
         RecyclerView recyclerView = binding.mainList;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(context, data);
+        Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(context, data);
         recyclerView.setAdapter(recyclerViewAdapter);
         SwipeRefreshLayout swipeRefreshLayout = binding.mainRefresh;
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -33,13 +35,14 @@ public class Functions {
             public void onRefresh() {
                 swipeRefreshLayout.setRefreshing(false);
                 RecyclerView recyclerView = binding.mainList;
-                recyclerView.setAdapter(new RecyclerViewAdapter(context, data));
+                recyclerView.setAdapter(new Main.RecyclerViewAdapter(context, data));
             }
         });
     }
 
     /**
      * Get data to populate Main Activity
+     *
      * @param which Which Fragment
      * @return Data
      */
@@ -90,6 +93,7 @@ public class Functions {
 
     /**
      * Set app theme
+     *
      * @param theme Theme
      */
     public static void setTheme(String theme) {

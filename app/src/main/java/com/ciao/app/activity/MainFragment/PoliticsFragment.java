@@ -1,4 +1,4 @@
-package com.ciao.app.fragment;
+package com.ciao.app.activity.MainFragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,17 +7,15 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.ciao.app.databinding.FragmentMainBinding;
 
 /**
- * News category Fragment
+ * Politics category Fragment
  */
-public class NewsFragment extends Fragment {
+public class PoliticsFragment extends Fragment {
     /**
      * Binding to get Views
      */
@@ -25,15 +23,16 @@ public class NewsFragment extends Fragment {
 
     /**
      * Create Fragment
-     * @param inflater Inflater
-     * @param container Container
+     *
+     * @param inflater           Inflater
+     * @param container          Container
      * @param savedInstanceState SavedInstanceState
      * @return View
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentMainBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        Functions.initFragment(getContext(), binding, R.string.news);
+        Functions.initFragment(getContext(), binding, R.string.politics);
         return root;
     }
 

@@ -2,6 +2,7 @@ package com.ciao.app;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.util.TypedValue;
@@ -91,9 +92,10 @@ public class ArticleBuilder {
 
     /**
      * Constructor
+     *
      * @param context Context
      * @param article Article
-     * @param text Text
+     * @param text    Text
      */
     public ArticleBuilder(Context context, LinearLayout article, String text) {
         this.context = context;
@@ -163,6 +165,7 @@ public class ArticleBuilder {
 
     /**
      * Add a h tag to the article
+     *
      * @param type Type of h tag
      * @param text Text
      */
@@ -208,6 +211,7 @@ public class ArticleBuilder {
 
     /**
      * Add a p tag to the article
+     *
      * @param text Text
      */
     public void addP(String text) {
@@ -220,6 +224,7 @@ public class ArticleBuilder {
 
     /**
      * Add a img tag to the article
+     *
      * @param src Source of image
      */
     public void addImg(String src) {
@@ -227,11 +232,13 @@ public class ArticleBuilder {
         imageView.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.no_image));
         imageView.setAdjustViewBounds(true);
         article.addView(imageView);
-        Glide.with(context).load(src).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+        Drawable placeholder = AppCompatResources.getDrawable(context, R.drawable.no_image);
+        Glide.with(context).load(src).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
     }
 
     /**
      * Add a figcaption to the article
+     *
      * @param text Text
      */
     public void addFigcaption(String text) {

@@ -3,7 +3,6 @@ package com.ciao.app.activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -17,6 +16,7 @@ import com.ciao.app.R;
 public class Settings extends AppCompatActivity {
     /**
      * Create Activity
+     *
      * @param savedInstanceState Not used
      */
     @Override

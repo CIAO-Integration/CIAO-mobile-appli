@@ -1,4 +1,4 @@
-package com.ciao.app.fragment;
+package com.ciao.app.activity.MainFragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,9 +13,9 @@ import com.ciao.app.R;
 import com.ciao.app.databinding.FragmentMainBinding;
 
 /**
- * Science category Fragment
+ * Sport category Fragment
  */
-public class ScienceFragment extends Fragment {
+public class SportFragment extends Fragment {
     /**
      * Binding to get Views
      */
@@ -23,15 +23,16 @@ public class ScienceFragment extends Fragment {
 
     /**
      * Create Fragment
-     * @param inflater Inflater
-     * @param container Container
+     *
+     * @param inflater           Inflater
+     * @param container          Container
      * @param savedInstanceState SavedInstanceState
      * @return View
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentMainBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        Functions.initFragment(getContext(), binding, R.string.science);
+        Functions.initFragment(getContext(), binding, R.string.sport);
         return root;
     }
 

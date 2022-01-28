@@ -20,6 +20,7 @@ import com.ciao.app.R;
 public class Article extends AppCompatActivity {
     /**
      * Create Activity
+     *
      * @param savedInstanceState Not used
      */
     @Override

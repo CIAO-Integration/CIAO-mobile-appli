@@ -7,58 +7,58 @@
 
     <fragment
         android:id="@+id/nav_browse"
-        android:name="com.ciao.app.fragment.BrowseFragment"
+        android:name="com.ciao.app.activity.MainFragment.BrowseFragment"
         android:label="@string/browse" />
 
     <fragment
         android:id="@+id/nav_around"
-        android:name="com.ciao.app.fragment.AroundFragment"
+        android:name="com.ciao.app.activity.MainFragment.AroundFragment"
         android:label="@string/around" />
 
     <fragment
         android:id="@+id/nav_news"
-        android:name="com.ciao.app.fragment.NewsFragment"
+        android:name="com.ciao.app.activity.MainFragment.NewsFragment"
         android:label="@string/news" />
 
     <fragment
         android:id="@+id/nav_popularization"
-        android:name="com.ciao.app.fragment.PopularizationFragment"
+        android:name="com.ciao.app.activity.MainFragment.PopularizationFragment"
         android:label="@string/popularization"
         tools:layout="@layout/fragment_main" />
 
     <fragment
         android:id="@+id/nav_digital"
-        android:name="com.ciao.app.fragment.DigitalFragment"
+        android:name="com.ciao.app.activity.MainFragment.DigitalFragment"
         android:label="@string/digital"
         tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_science"
-        android:name="com.ciao.app.fragment.ScienceFragment"
+        android:name="com.ciao.app.activity.MainFragment.ScienceFragment"
         android:label="@string/science"
         tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_culture"
-        android:name="com.ciao.app.fragment.CultureFragment"
+        android:name="com.ciao.app.activity.MainFragment.CultureFragment"
         android:label="@string/culture"
         tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_history"
-        android:name="com.ciao.app.fragment.HistoryFragment"
+        android:name="com.ciao.app.activity.MainFragment.HistoryFragment"
         android:label="@string/history"
         tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_geography"
-        android:name="com.ciao.app.fragment.GeographyFragment"
+        android:name="com.ciao.app.activity.MainFragment.GeographyFragment"
         android:label="@string/geography"
         tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_politics"
-        android:name="com.ciao.app.fragment.PoliticsFragment"
+        android:name="com.ciao.app.activity.MainFragment.PoliticsFragment"
         android:label="@string/politics"
         tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/nav_sport"
-        android:name="com.ciao.app.fragment.SportFragment"
+        android:name="com.ciao.app.activity.MainFragment.SportFragment"
         android:label="@string/sport"
         tools:layout="@layout/fragment_main" />
 </navigation>
