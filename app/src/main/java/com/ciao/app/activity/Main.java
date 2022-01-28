@@ -1,9 +1,8 @@
 package com.ciao.app.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -11,43 +10,45 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.PreferenceManager;
 
+import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.ciao.app.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationView;
 
+/**
+ * Activity showing the main screen
+ */
 public class Main extends AppCompatActivity {
-
-    private AppBarConfiguration mAppBarConfiguration;
+    /**
+     * Binding to get Views
+     */
     private ActivityMainBinding binding;
-    private DrawerLayout drawer;
 
+    /**
+     * Create Activity
+     * @param savedInstanceState Not used
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String theme = sharedPreferences.getString("theme", "light");
+        Functions.setTheme(theme);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+
+        //setContentView(R.layout.loading_screen);
+
         setContentView(binding.getRoot());
 
-        //setSupportActionBar(binding.appBarMain.toolbar);
-        /*binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
-        drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
@@ -55,6 +56,12 @@ public class Main extends AppCompatActivity {
             public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
                 String text = null;
                 switch (destination.getId()) {
+                    case R.id.nav_browse:
+                        text = getString(R.string.browse);
+                        break;
+                    case R.id.nav_around:
+                        text = getString(R.string.around);
+                        break;
                     case R.id.nav_news:
                         text = getString(R.string.news);
                         break;
@@ -83,44 +90,51 @@ public class Main extends AppCompatActivity {
                         text = getString(R.string.sport);
                         break;
                 }
-                TextView title = findViewById(R.id.main_title);
+                TextView title = findViewById(R.id.actionbar_title);
                 title.setText(text);
             }
         });
-        //NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
         /*if(!connected){
             Menu menu = navigationView.getMenu();
             menu.findItem(R.id.nav_around).setVisible(false);
         }*/
+
+        findViewById(R.id.actionbar_logo).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openDrawer();
+            }
+        });
+        findViewById(R.id.actionbar_avatar).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settings();
+            }
+        });
     }
 
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }*/
-
-    /*@Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
-                || super.onSupportNavigateUp();
-    }*/
-
-
-    public void openDrawer(View view) {
-        drawer.open();
+    /**
+     * Open navigation drawer
+     */
+    public void openDrawer() {
+        binding.drawerLayout.open();
     }
 
-    public void settings(View view) {
+    /**
+     * Start Settings Activity
+     */
+    public void settings() {
         startActivity(new Intent(this, Settings.class));
     }
 
-    public void search(View view){
-        EditText editText = findViewById(R.id.main_search);
+    /**
+     * Search
+     * @param view View
+     */
+    public void search(View view) {
+        EditText editText = findViewById(R.id.main_searchBar);
         String text = editText.getText().toString();
     }
 }
