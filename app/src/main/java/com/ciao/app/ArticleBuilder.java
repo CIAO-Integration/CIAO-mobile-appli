@@ -1,8 +1,6 @@
 package com.ciao.app;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -15,41 +13,97 @@ import android.widget.TextView;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.text.HtmlCompat;
 
-import com.ciao.app.activity.Article;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
-import java.util.ArrayList;
-
+/**
+ * Build an Article from a text
+ */
 public class ArticleBuilder {
+    /**
+     * Size of h1
+     */
     private final int H1_SIZE = 26;
+    /**
+     * Padding of h1
+     */
     private final int H1_PADDING = 48;
+    /**
+     * Size of h2
+     */
     private final int H2_SIZE = 24;
+    /**
+     * Padding of h2
+     */
     private final int H2_PADDING = 40;
+    /**
+     * Size of h3
+     */
     private final int H3_SIZE = 22;
+    /**
+     * Padding of h3
+     */
     private final int H3_PADDING = 32;
+    /**
+     * Size of h4
+     */
     private final int H4_SIZE = 20;
+    /**
+     * Padding of h4
+     */
     private final int H4_PADDING = 24;
+    /**
+     * Size of h5
+     */
     private final int H5_SIZE = 18;
+    /**
+     * Padding of h5
+     */
     private final int H5_PADDING = 16;
+    /**
+     * Size of h6
+     */
     private final int H6_SIZE = 16;
+    /**
+     * Padding of h6
+     */
     private final int H6_PADDING = 8;
+    /**
+     * Size of p
+     */
     private final int P_SIZE = 16;
+    /**
+     * Size of figcaption
+     */
     private final int FIGCAPTION_SIZE = 12;
+    /**
+     * Context
+     */
     private Context context;
+    /**
+     * Article
+     */
     private LinearLayout article;
+    /**
+     * Text
+     */
     private String text;
-    private ImageView imageView;
-    private ArrayList<ImageView> images;
-    private String target;
-    private ArrayList<String> sources;
 
+    /**
+     * Constructor
+     * @param context Context
+     * @param article Article
+     * @param text Text
+     */
     public ArticleBuilder(Context context, LinearLayout article, String text) {
         this.context = context;
         this.article = article;
         this.text = text;
-        images = new ArrayList<>();
-        sources = new ArrayList<>();
     }
 
+    /**
+     * Parse and build the article
+     */
     public void build() {
         int i = 0;
         while (i < text.length()) {
@@ -105,9 +159,13 @@ public class ArticleBuilder {
                 i++;
             }
         }
-        Functions.downloadImgs(context, sources, Article.BROADCAST_TARGET);
     }
 
+    /**
+     * Add a h tag to the article
+     * @param type Type of h tag
+     * @param text Text
+     */
     public void addH(int type, String text) {
         int size = 0;
         int padding = 0;
@@ -148,6 +206,10 @@ public class ArticleBuilder {
         article.addView(textView);
     }
 
+    /**
+     * Add a p tag to the article
+     * @param text Text
+     */
     public void addP(String text) {
         TextView textView = new TextView(context);
         textView.setText(HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY));
@@ -156,30 +218,27 @@ public class ArticleBuilder {
         article.addView(textView);
     }
 
+    /**
+     * Add a img tag to the article
+     * @param src Source of image
+     */
     public void addImg(String src) {
-        imageView = new ImageView(context);
+        ImageView imageView = new ImageView(context);
         imageView.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.no_image));
         imageView.setAdjustViewBounds(true);
         article.addView(imageView);
-        images.add(imageView);
-        sources.add(src);
+        Glide.with(context).load(src).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
     }
 
+    /**
+     * Add a figcaption to the article
+     * @param text Text
+     */
     public void addFigcaption(String text) {
         TextView textView = new TextView(context);
         textView.setText(text);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, FIGCAPTION_SIZE);
         textView.setTypeface(textView.getTypeface(), Typeface.ITALIC);
         article.addView(textView);
-    }
-
-    public void setImgs(ArrayList<String> fileNames) {
-        for (int i = 0; i < fileNames.size(); i++) {
-            ImageView imageView = images.get(i);
-            Bitmap bitmap = BitmapFactory.decodeFile(context.getCacheDir() + "/" + fileNames.get(i));
-            if (bitmap != null) {
-                imageView.setImageBitmap(bitmap);
-            }
-        }
     }
 }

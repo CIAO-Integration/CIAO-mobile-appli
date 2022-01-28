@@ -2,8 +2,6 @@ package com.ciao.app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.ciao.app.activity.Article;
 
 import java.util.ArrayList;
@@ -43,11 +43,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         if (data.get(position)[1] != null) {
             String source = data.get(position)[1];
-            String fileName = source.split("/")[source.split("/").length - 1];
-            Bitmap bitmap = BitmapFactory.decodeFile(context.getCacheDir() + "/" + fileName);
-            if (bitmap != null) {
-                holder.image.setImageBitmap(bitmap);
-            }
+            Glide.with(context).load(source).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.image);
         }
 
         String id = data.get(position)[0];

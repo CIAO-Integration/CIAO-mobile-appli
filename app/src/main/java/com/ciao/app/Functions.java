@@ -1,7 +1,6 @@
 package com.ciao.app;
 
 import android.content.Context;
-import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,7 +11,16 @@ import com.ciao.app.databinding.FragmentMainBinding;
 
 import java.util.ArrayList;
 
+/**
+ * Functions
+ */
 public class Functions {
+    /**
+     * Init a Fragment of Main Activity
+     * @param context Context
+     * @param binding Binding to get Views
+     * @param which Which Fragment
+     */
     public static void initFragment(Context context, FragmentMainBinding binding, int which) {
         ArrayList<String[]> data = getData(which);
         RecyclerView recyclerView = binding.mainList;
@@ -30,6 +38,11 @@ public class Functions {
         });
     }
 
+    /**
+     * Get data to populate Main Activity
+     * @param which Which Fragment
+     * @return Data
+     */
     public static ArrayList<String[]> getData(int which) {
         ArrayList<String[]> data = new ArrayList<>();
         switch (which) {
@@ -75,6 +88,10 @@ public class Functions {
         return data;
     }
 
+    /**
+     * Set app theme
+     * @param theme Theme
+     */
     public static void setTheme(String theme) {
         switch (theme) {
             case "system":
@@ -86,15 +103,6 @@ public class Functions {
             case "dark":
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 break;
-        }
-    }
-
-    public static void downloadImgs(Context context, ArrayList<String> sources, String target) {
-        if (sources.size() > 0) {
-            Intent intent = new Intent(context, ImageDownloader.class);
-            intent.putExtra("sources", sources);
-            intent.putExtra("target", target);
-            context.startService(intent);
         }
     }
 }

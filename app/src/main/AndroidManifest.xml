@@ -23,8 +23,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.Article" />
-
-        <service android:name=".ImageDownloader" />
     </application>
 
 </manifest>

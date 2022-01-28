@@ -1,9 +1,6 @@
 package com.ciao.app.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -25,19 +22,22 @@ import com.ciao.app.R;
 import com.ciao.app.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.ArrayList;
-
+/**
+ * Activity showing the main screen
+ */
 public class Main extends AppCompatActivity {
-    public static final String BROADCAST_TARGET = "Main";
+    /**
+     * Binding to get Views
+     */
     private ActivityMainBinding binding;
-    private DrawerLayout drawer;
-    private ImageDownloaderReceiver imageDownloaderReceiver;
 
+    /**
+     * Create Activity
+     * @param savedInstanceState Not used
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        imageDownloaderReceiver = new ImageDownloaderReceiver();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String theme = sharedPreferences.getString("theme", "light");
@@ -45,49 +45,9 @@ public class Main extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
-        setContentView(R.layout.loading_screen);
+        //setContentView(R.layout.loading_screen);
 
-        refresh();
-    }
-
-    public void openDrawer() {
-        drawer.open();
-    }
-
-    public void settings() {
-        startActivity(new Intent(this, Settings.class));
-    }
-
-    public void search(View view) {
-        EditText editText = findViewById(R.id.main_searchBar);
-        String text = editText.getText().toString();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        registerReceiver(imageDownloaderReceiver, new IntentFilter(BROADCAST_TARGET));
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unregisterReceiver(imageDownloaderReceiver);
-    }
-
-    public void refresh() {
-        ArrayList<String[]> data = Functions.getData(R.string.sport);
-        ArrayList<String> sources = new ArrayList<>();
-        for (String[] d : data) {
-            sources.add(d[1]);
-        }
-        Functions.downloadImgs(this, sources, Main.BROADCAST_TARGET);
-    }
-
-    public void init() {
         setContentView(binding.getRoot());
-
-        drawer = binding.drawerLayout;
 
         NavigationView navigationView = binding.navView;
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -155,11 +115,26 @@ public class Main extends AppCompatActivity {
         });
     }
 
-    private class ImageDownloaderReceiver extends BroadcastReceiver {
+    /**
+     * Open navigation drawer
+     */
+    public void openDrawer() {
+        binding.drawerLayout.open();
+    }
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            init();
-        }
+    /**
+     * Start Settings Activity
+     */
+    public void settings() {
+        startActivity(new Intent(this, Settings.class));
+    }
+
+    /**
+     * Search
+     * @param view View
+     */
+    public void search(View view) {
+        EditText editText = findViewById(R.id.main_searchBar);
+        String text = editText.getText().toString();
     }
 }

@@ -14,21 +14,32 @@ import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.ciao.app.databinding.FragmentMainBinding;
 
+/**
+ * News category Fragment
+ */
 public class NewsFragment extends Fragment {
-
+    /**
+     * Binding to get Views
+     */
     private FragmentMainBinding binding;
-    private RecyclerView recyclerView;
-    private SwipeRefreshLayout swipeRefreshLayout;
 
+    /**
+     * Create Fragment
+     * @param inflater Inflater
+     * @param container Container
+     * @param savedInstanceState SavedInstanceState
+     * @return View
+     */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentMainBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
         Functions.initFragment(getContext(), binding, R.string.news);
-
         return root;
     }
 
+    /**
+     * Action on destroy
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

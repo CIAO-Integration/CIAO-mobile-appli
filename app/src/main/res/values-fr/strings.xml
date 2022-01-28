@@ -11,11 +11,12 @@
     <string name="politics">Politique</string>
     <string name="sport">Sport</string>
     <string name="browse">Parcourir</string>
-    <string name="around">Autour</string>
+    <string name="around">Autour de vous</string>
     <string name="theme">Thème</string>
     <string name="system">Système</string>
     <string name="light">Clair</string>
     <string name="dark">Sombre</string>
     <string name="article">Article</string>
     <string name="video">Vidéo</string>
+    <string name="guest">Invité</string>
 </resources>

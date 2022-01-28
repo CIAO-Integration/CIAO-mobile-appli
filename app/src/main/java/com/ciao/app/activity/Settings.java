@@ -11,8 +11,14 @@ import androidx.preference.PreferenceManager;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
 
+/**
+ * Activity showing settings
+ */
 public class Settings extends AppCompatActivity {
-
+    /**
+     * Create Activity
+     * @param savedInstanceState Not used
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,10 +28,6 @@ public class Settings extends AppCompatActivity {
                     .beginTransaction()
                     .replace(R.id.settings, new SettingsFragment())
                     .commit();
-        }
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -39,6 +41,9 @@ public class Settings extends AppCompatActivity {
         });
     }
 
+    /**
+     * Actual settings
+     */
     public static class SettingsFragment extends PreferenceFragmentCompat {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
