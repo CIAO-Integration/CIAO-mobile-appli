@@ -24,8 +24,9 @@
     <string name="login">Connexion</string>
     <string name="no_account">Pas encore de compte ?</string>
     <string name="continue_guest">Continuer en tant qu\'Invité</string>
-    <string name="have_account">Vous avez un compte ?</string>
+    <string name="have_account">Vous avez déjà un compte ?</string>
     <string name="confirm_password">"Confirmer mot de passe "</string>
     <string name="register">Inscription</string>
     <string name="wrong_credentials">Mauvais identifiants</string>
+    <string name="username">Nom d\'utilisateur</string>
 </resources>

@@ -62,9 +62,11 @@ public class Login extends AppCompatActivity {
      * @param view View
      */
     public void register(View view) {
+        EditText username = findViewById(R.id.login_register_username);
         EditText email = findViewById(R.id.login_register_email);
         EditText password = findViewById(R.id.login_register_password);
         EditText confirmPassword = findViewById(R.id.login_register_confirm_password);
+        Log.d("username", username.getText().toString());
         Log.d("email", email.getText().toString());
         Log.d("password", password.getText().toString());
         Log.d("confirmPassword", confirmPassword.getText().toString());
