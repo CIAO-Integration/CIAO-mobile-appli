@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.Article" />
+        <activity android:name=".activity.Login" />
     </application>
 
 </manifest>

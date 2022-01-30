@@ -19,4 +19,13 @@
     <string name="article">Article</string>
     <string name="video">Vidéo</string>
     <string name="guest">Invité</string>
+    <string name="email">Email</string>
+    <string name="password">Mot de passe</string>
+    <string name="login">Connexion</string>
+    <string name="no_account">Pas encore de compte ?</string>
+    <string name="continue_guest">Continuer en tant qu\'Invité</string>
+    <string name="have_account">Vous avez un compte ?</string>
+    <string name="confirm_password">"Confirmer mot de passe "</string>
+    <string name="register">Inscription</string>
+    <string name="wrong_credentials">Mauvais identifiants</string>
 </resources>

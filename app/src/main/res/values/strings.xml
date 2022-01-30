@@ -19,4 +19,13 @@
     <string name="article">Article</string>
     <string name="video">Video</string>
     <string name="guest">Guest</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Log in</string>
+    <string name="no_account">Don\'t have an account yet ?</string>
+    <string name="continue_guest">Continue as Guest</string>
+    <string name="have_account">Have an account ?</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="register">Register</string>
+    <string name="wrong_credentials">Wrong credentials</string>
 </resources>

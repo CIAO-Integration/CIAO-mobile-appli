@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.cardview.widget.CardView;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
@@ -28,7 +29,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
-import com.ciao.app.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
@@ -38,9 +38,13 @@ import java.util.ArrayList;
  */
 public class Main extends AppCompatActivity {
     /**
-     * Binding to get Views
+     * SharedPreferences
      */
-    private ActivityMainBinding binding;
+    private SharedPreferences sharedPreferences;
+    /**
+     * SharedPreferences editor
+     */
+    private SharedPreferences.Editor editor;
 
     /**
      * Create Activity
@@ -51,17 +55,23 @@ public class Main extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = sharedPreferences.edit();
+
+        Boolean firstTime = sharedPreferences.getBoolean("firstTime", true);
+        if (firstTime) {
+            finish();
+            startActivity(new Intent(this, Login.class));
+        }
+
         String theme = sharedPreferences.getString("theme", "light");
         Functions.setTheme(theme);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-
         //setContentView(R.layout.loading_screen);
 
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_main);
 
-        NavigationView navigationView = binding.navView;
+        NavigationView navigationView = findViewById(R.id.nav_view);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
@@ -131,7 +141,8 @@ public class Main extends AppCompatActivity {
      * Open navigation drawer
      */
     public void openDrawer() {
-        binding.drawerLayout.open();
+        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout.open();
     }
 
     /**
