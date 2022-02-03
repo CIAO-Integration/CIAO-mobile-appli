@@ -1,6 +1,8 @@
 package com.ciao.app;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -108,5 +110,17 @@ public class Functions {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 break;
         }
+    }
+
+    /**
+     * Open an URL in web browser
+     *
+     * @param context Context
+     * @param url     Url
+     */
+    public static void openUrl(Context context, String url) {
+        Uri uri = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        context.startActivity(intent);
     }
 }

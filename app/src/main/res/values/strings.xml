@@ -29,4 +29,15 @@
     <string name="register">Register</string>
     <string name="wrong_credentials">Wrong credentials</string>
     <string name="username">Username</string>
+    <string name="gps">GPS sensor</string>
+    <string name="ip">IP address</string>
+    <string name="manual">Manual</string>
+    <string name="disabled">Disabled</string>
+    <string name="application">Application</string>
+    <string name="account">Account</string>
+    <string name="about">About</string>
+    <string name="location">Location</string>
+    <string name="authors">Authors</string>
+    <string name="source_code">Source code</string>
+    <string name="version">Version</string>
 </resources>

@@ -1,30 +1,54 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:iconSpaceReserved="false">
 
-    <PreferenceCategory app:title="@string/theme">
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/application">
 
         <ListPreference
             app:defaultValue="light"
             app:entries="@array/theme_entries"
             app:entryValues="@array/theme_values"
+            app:iconSpaceReserved="false"
             app:key="theme"
             app:title="@string/theme"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:defaultValue="disabled"
+            app:entries="@array/location_entries"
+            app:entryValues="@array/location_values"
+            app:iconSpaceReserved="false"
+            app:key="location_mode"
+            app:title="@string/location"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
-
-    <!--<PreferenceCategory app:title="@string/sync_header">
-
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
-
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
-
+    <!--<PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/account">
+        <Preference
+            app:iconSpaceReserved="false"
+            app:summary="currently connected as xxx"
+            app:title="Disconnect" />
     </PreferenceCategory>-->
-
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/about">
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="authors"
+            app:summary="Team CIAO"
+            app:title="@string/authors" />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="source"
+            app:summary="https://github.com/CIAO-Integration"
+            app:title="@string/source_code" />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="version"
+            app:summary="1.0"
+            app:title="@string/version" />
+    </PreferenceCategory>
 </PreferenceScreen>
