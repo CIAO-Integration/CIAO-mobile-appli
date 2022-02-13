@@ -13,7 +13,7 @@
         android:theme="@style/Theme.CIAO">
         <activity android:name=".activity.Settings" />
         <activity
-            android:name=".activity.Main"
+            android:name=".activity.Loading"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true">
             <intent-filter>
@@ -22,8 +22,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.Article" />
-        <activity android:name=".activity.Login" />
+        <activity android:name=".activity.Main" />
+        <activity android:name=".activity.Production" />
+        <activity
+            android:name=".activity.Login"
+            android:screenOrientation="portrait" />
+
+        <service android:name=".JsonFromUrl" />
+        <service android:name=".TextFromUrl" />
     </application>
 
 </manifest>

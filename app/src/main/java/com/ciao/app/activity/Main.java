@@ -1,5 +1,6 @@
 package com.ciao.app.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,24 +28,34 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Activity showing the main screen
  */
 public class Main extends AppCompatActivity {
     /**
-     * SharedPreferences
+     * Target for broadcast receiver
+     */
+    public static final String TARGET = "Main";
+    /**
+     * Shared preferences
      */
     private SharedPreferences sharedPreferences;
     /**
-     * SharedPreferences editor
+     * Broadcast receiver for JsonFromUrl
      */
-    private SharedPreferences.Editor editor;
+    private JsonReceiver jsonReceiver;
 
     /**
      * Create Activity
@@ -56,18 +67,12 @@ public class Main extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        editor = sharedPreferences.edit();
 
         Boolean firstTime = sharedPreferences.getBoolean("firstTime", true);
         if (firstTime) {
             finish();
             startActivity(new Intent(this, Login.class));
         }
-
-        String theme = sharedPreferences.getString("theme", "light");
-        Functions.setTheme(theme);
-
-        //setContentView(R.layout.loading_screen);
 
         setContentView(R.layout.activity_main);
 
@@ -173,7 +178,7 @@ public class Main extends AppCompatActivity {
         /**
          * Data
          */
-        private ArrayList<String[]> data;
+        private ArrayList<HashMap<String, String>> data;
 
         /**
          * Constructor
@@ -181,7 +186,7 @@ public class Main extends AppCompatActivity {
          * @param context Context
          * @param data    Data
          */
-        public RecyclerViewAdapter(Context context, ArrayList<String[]> data) {
+        public RecyclerViewAdapter(Context context, ArrayList<HashMap<String, String>> data) {
             this.context = context;
             this.data = data;
         }
@@ -209,18 +214,23 @@ public class Main extends AppCompatActivity {
          */
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.title.setText(data.get(position)[2]);
-            holder.description.setText(data.get(position)[3]);
-            if (data.get(position)[1] != null) {
-                String source = data.get(position)[1];
+            holder.title.setText(data.get(position).get("title"));
+            if (data.get(position).get("thumbnail") != null) {
+                String source = data.get(position).get("thumbnail");
+                if (!source.startsWith("http")) {
+                    source = BuildConfig.STORAGE_SERVER_URL + source;
+                }
                 Drawable placeholder = AppCompatResources.getDrawable(context, R.drawable.no_image);
                 Glide.with(context).load(source).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.image);
             }
-            String id = data.get(position)[0];
+            String id = data.get(position).get("id");
+            if (id.startsWith("vid")) {
+                holder.image.setForeground(AppCompatResources.getDrawable(context, android.R.drawable.ic_media_play));
+            }
             holder.card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(context, Article.class);
+                    Intent intent = new Intent(context, Production.class);
                     intent.putExtra("id", id);
                     context.startActivity(intent);
                 }
@@ -253,10 +263,6 @@ public class Main extends AppCompatActivity {
              * Title of item
              */
             private TextView title;
-            /**
-             * Description of item
-             */
-            private TextView description;
 
             /**
              * Constructor
@@ -268,7 +274,35 @@ public class Main extends AppCompatActivity {
                 card = view.findViewById(R.id.item_card);
                 image = view.findViewById(R.id.item_image);
                 title = view.findViewById(R.id.item_title);
-                description = view.findViewById(R.id.item_description);
+            }
+        }
+    }
+
+    /**
+     * Broadcast receiver for Json FromUrl
+     */
+    private class JsonReceiver extends BroadcastReceiver {
+        /**
+         * @param context Context
+         * @param intent  Intent
+         */
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //cancel load
+            unregisterReceiver(jsonReceiver);
+            if (intent.getStringExtra("json") != null) {
+                try {
+                    JSONObject json = new JSONObject(intent.getStringExtra("json"));
+                    String status = json.getString("status");
+                    if (status.equals("200")) {
+                        JSONArray array = json.getJSONArray("list");
+                        Functions.storeTimeline(context, array);
+                    } else {
+                        //error
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

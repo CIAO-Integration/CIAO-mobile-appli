@@ -107,59 +107,63 @@ public class ArticleBuilder {
      * Parse and build the article
      */
     public void build() {
-        int i = 0;
-        while (i < text.length()) {
-            if (String.valueOf(text.charAt(i)).equals("<")) {
-                String tagBegin = text.substring(i, text.indexOf(">", i) + 1);
-                Log.d("tag", tagBegin);
-                if (tagBegin.contains("img") && tagBegin.contains("src")) {
-                    char quote;
-                    if (tagBegin.contains("'")) {
-                        quote = '\'';
-                    } else {
-                        quote = '\"';
+        try {
+            int i = 0;
+            while (i < text.length()) {
+                if (String.valueOf(text.charAt(i)).equals("<")) {
+                    String tagBegin = text.substring(i, text.indexOf(">", i) + 1);
+                    Log.d("tag", tagBegin);
+                    if (tagBegin.contains("img") && tagBegin.contains("src")) {
+                        char quote;
+                        if (tagBegin.contains("'")) {
+                            quote = '\'';
+                        } else {
+                            quote = '\"';
+                        }
+                        int startIndex = tagBegin.indexOf("src=" + quote) + 5;
+                        int endIndex = tagBegin.indexOf(quote, startIndex);
+                        String src = tagBegin.substring(startIndex, endIndex);
+                        Log.d("src", src);
+                        addImg(src);
+                        i += tagBegin.length();
+                        continue;
                     }
-                    int startIndex = tagBegin.indexOf("src=" + quote) + 5;
-                    int endIndex = tagBegin.indexOf(quote, startIndex);
-                    String src = tagBegin.substring(startIndex, endIndex);
-                    Log.d("src", src);
-                    addImg(src);
-                    i += tagBegin.length();
-                    continue;
+                    String tagEnd = tagBegin.charAt(0) + "/" + tagBegin.substring(1);
+                    int endIndex = text.indexOf(tagEnd, i) + tagEnd.length();
+                    String content = text.substring(i, endIndex).replace(tagBegin, "").replace(tagEnd, "");
+                    Log.d("content", content);
+                    switch (tagBegin) {
+                        case "<h1>":
+                            addH(1, content);
+                            break;
+                        case "<h2>":
+                            addH(2, content);
+                            break;
+                        case "<h3>":
+                            addH(3, content);
+                            break;
+                        case "<h4>":
+                            addH(4, content);
+                            break;
+                        case "<h5>":
+                            addH(5, content);
+                            break;
+                        case "<h6>":
+                            addH(6, content);
+                            break;
+                        case "<p>":
+                            addP(content);
+                            break;
+                        case "<figcaption>":
+                            addFigcaption(content);
+                    }
+                    i = endIndex;
+                } else {
+                    i++;
                 }
-                String tagEnd = tagBegin.charAt(0) + "/" + tagBegin.substring(1);
-                int endIndex = text.indexOf(tagEnd, i) + tagEnd.length();
-                String content = text.substring(i, endIndex).replace(tagBegin, "").replace(tagEnd, "");
-                Log.d("content", content);
-                switch (tagBegin) {
-                    case "<h1>":
-                        addH(1, content);
-                        break;
-                    case "<h2>":
-                        addH(2, content);
-                        break;
-                    case "<h3>":
-                        addH(3, content);
-                        break;
-                    case "<h4>":
-                        addH(4, content);
-                        break;
-                    case "<h5>":
-                        addH(5, content);
-                        break;
-                    case "<h6>":
-                        addH(6, content);
-                        break;
-                    case "<p>":
-                        addP(content);
-                        break;
-                    case "<figcaption>":
-                        addFigcaption(content);
-                }
-                i = endIndex;
-            } else {
-                i++;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

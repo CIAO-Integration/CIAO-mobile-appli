@@ -1,7 +1,9 @@
 package com.ciao.app;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 
 import androidx.appcompat.app.AppCompatDelegate;
@@ -12,7 +14,14 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.ciao.app.activity.Main;
 import com.ciao.app.databinding.FragmentMainBinding;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Functions
@@ -26,71 +35,98 @@ public class Functions {
      * @param which   Which Fragment
      */
     public static void initFragment(Context context, FragmentMainBinding binding, int which) {
-        ArrayList<String[]> data = getData(which);
         RecyclerView recyclerView = binding.mainList;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(context, data);
-        recyclerView.setAdapter(recyclerViewAdapter);
         SwipeRefreshLayout swipeRefreshLayout = binding.mainRefresh;
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 swipeRefreshLayout.setRefreshing(false);
-                RecyclerView recyclerView = binding.mainList;
-                recyclerView.setAdapter(new Main.RecyclerViewAdapter(context, data));
             }
         });
+        Database database = new Database(context);
+        ArrayList<HashMap<String, String>> data = null;
+        switch (which) {
+            case R.string.browse:
+                data = database.getRows(null, null);
+                break;
+            case R.string.around:
+                //data = database.getRows();
+                break;
+            case R.string.news:
+                data = database.getRows("actualite", null);
+                break;
+            case R.string.popularization:
+                data = database.getRows("vulgarisation", null);
+                break;
+            case R.string.digital:
+                data = database.getRows("numerique", null);
+                break;
+            case R.string.science:
+                data = database.getRows("science", null);
+                break;
+            case R.string.culture:
+                data = database.getRows("culture", null);
+                break;
+            case R.string.history:
+                data = database.getRows("histoire", null);
+                break;
+            case R.string.geography:
+                data = database.getRows("geographie", null);
+                break;
+            case R.string.politics:
+                data = database.getRows("politique", null);
+                break;
+            case R.string.sport:
+                data = database.getRows("sport", null);
+                break;
+        }
+        database.close();
+        Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(context, data);
+        recyclerView.setAdapter(recyclerViewAdapter);
     }
 
     /**
-     * Get data to populate Main Activity
+     * Get data to populate timeline
      *
-     * @param which Which Fragment
-     * @return Data
+     * @param context           Context
+     * @param broadcastReceiver Broadcast receiver
+     * @param target            Target
      */
-    public static ArrayList<String[]> getData(int which) {
-        ArrayList<String[]> data = new ArrayList<>();
-        switch (which) {
-            case R.string.browse:
-                data.add(new String[]{"000", null, "Hello", "browse"});
-                break;
-            case R.string.around:
-                data.add(new String[]{"000", null, "Hello", "around"});
-                break;
-            case R.string.news:
-                data.add(new String[]{"001", null, "Hello", "news"});
-                break;
-            case R.string.popularization:
-                data.add(new String[]{"002", null, "Hello", "popularization"});
-                break;
-            case R.string.digital:
-                data.add(new String[]{"003", null, "Hello", "digital"});
-                break;
-            case R.string.science:
-                data.add(new String[]{"004", null, "Hello", "science"});
-                break;
-            case R.string.culture:
-                data.add(new String[]{"005", null, "Hello", "culture"});
-                break;
-            case R.string.history:
-                data.add(new String[]{"006", null, "Hello", "history"});
-                break;
-            case R.string.geography:
-                data.add(new String[]{"007", null, "Hello", "geography"});
-                break;
-            case R.string.politics:
-                data.add(new String[]{"008", null, "Hello", "politics"});
-                break;
-            case R.string.sport:
-                data.add(new String[]{"009", null, "Hello", "sport"});
-                break;
+    public static void refreshTimeline(Context context, BroadcastReceiver broadcastReceiver, String target) {
+        Map<String, String> arguments = new HashMap();
+        arguments.put("request", "timeline");
+        context.registerReceiver(broadcastReceiver, new IntentFilter(target));
+        Intent intent = new Intent(context, JsonFromUrl.class);
+        intent.putExtra("arguments", (Serializable) arguments);
+        intent.putExtra("target", target);
+        context.startService(intent);
+    }
+
+    /**
+     * Store data into database
+     *
+     * @param context Context
+     * @param array   Data
+     * @throws JSONException Bad JSON
+     */
+    public static void storeTimeline(Context context, JSONArray array) throws JSONException {
+        ArrayList<HashMap<String, String>> rows = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject item = array.getJSONObject(i);
+            HashMap<String, String> row = new HashMap<>();
+            row.put("id", item.getString("id"));
+            row.put("thumbnail", item.getString("thumbnail"));
+            row.put("title", item.getString("title"));
+            row.put("tags", item.getString("tags"));
+            row.put("date", item.getString("date"));
+            row.put("location", item.getString("location"));
+            rows.add(row);
         }
-        data.add(new String[]{"010", "https://www.akamai.com/content/dam/site/im-demo/perceptual-standard.jpg?imbypass=true", "Hello", "World"});
-        data.add(new String[]{"011", "https://images.lanouvellerepublique.fr/image/upload/618f18685870969b0a8b45ab.jpg", "Hello", "World"});
-        data.add(new String[]{"012", "https://www.largus.fr/images/images/xv-illu-avg.jpg", "Hello", "World"});
-        data.add(new String[]{"013", "https://media.sudouest.fr/8040046/1000x500/12630a98-5c97-4c19-ad90-c207ac7f4808.jpg?v=1643222191", "Hello", "World"});
-        data.add(new String[]{"014", "https://www.subaru-global.com/ebrochure/XV/2021my/HAFR/exterior/assets/FHI/MY21/XV/HAFR/Exterior/mp4-svg-360/exterior_360/d_exterior_360_01_01.jpg?40589e3e6f3ee2fc4f55e2bacd02532f", "Hello", "World"});
-        return data;
+        Database database = new Database(context);
+        database.clear();
+        database.insertInto(rows);
+        database.close();
     }
 
     /**

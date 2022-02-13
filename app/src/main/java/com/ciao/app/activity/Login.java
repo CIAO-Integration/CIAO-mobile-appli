@@ -20,11 +20,11 @@ import com.google.android.material.snackbar.Snackbar;
  */
 public class Login extends AppCompatActivity {
     /**
-     * SharedPreferences
+     * Shared preferences
      */
     private SharedPreferences sharedPreferences;
     /**
-     * SharedPreferences editor
+     * Shared preferences editor
      */
     private SharedPreferences.Editor editor;
 
@@ -113,6 +113,6 @@ public class Login extends AppCompatActivity {
         editor.putBoolean("firstTime", false);
         editor.apply();
         finish();
-        startActivity(new Intent(this, Main.class));
+        startActivity(new Intent(this, Loading.class));
     }
 }

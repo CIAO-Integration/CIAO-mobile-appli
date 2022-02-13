@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -31,24 +30,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
-                    app:srcCompat="@drawable/no_image"
-                    tools:layout_editor_absoluteX="74dp"
-                    tools:layout_editor_absoluteY="41dp" />
+                    android:foregroundGravity="center"
+                    app:srcCompat="@drawable/no_image" />
             </androidx.cardview.widget.CardView>
 
             <TextView
                 android:id="@+id/item.title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="8dp"
                 android:gravity="center"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/item.description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
