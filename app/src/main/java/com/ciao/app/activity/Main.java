@@ -52,10 +52,6 @@ public class Main extends AppCompatActivity {
      * Shared preferences
      */
     private SharedPreferences sharedPreferences;
-    /**
-     * Broadcast receiver for JsonFromUrl
-     */
-    private JsonReceiver jsonReceiver;
 
     /**
      * Create Activity
@@ -174,11 +170,11 @@ public class Main extends AppCompatActivity {
         /**
          * Context
          */
-        private Context context;
+        private final Context context;
         /**
          * Data
          */
-        private ArrayList<HashMap<String, String>> data;
+        private final ArrayList<HashMap<String, String>> data;
 
         /**
          * Constructor
@@ -254,15 +250,15 @@ public class Main extends AppCompatActivity {
             /**
              * Card
              */
-            private CardView card;
+            private final CardView card;
             /**
              * Image of item
              */
-            private ImageView image;
+            private final ImageView image;
             /**
              * Title of item
              */
-            private TextView title;
+            private final TextView title;
 
             /**
              * Constructor
@@ -289,7 +285,7 @@ public class Main extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             //cancel load
-            unregisterReceiver(jsonReceiver);
+            unregisterReceiver(this);
             if (intent.getStringExtra("json") != null) {
                 try {
                     JSONObject json = new JSONObject(intent.getStringExtra("json"));

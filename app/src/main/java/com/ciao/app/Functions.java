@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.ciao.app.activity.Main;
+import com.ciao.app.activity.MainFragment.RefreshReceiver;
 import com.ciao.app.databinding.FragmentMainBinding;
 
 import org.json.JSONArray;
@@ -37,53 +38,56 @@ public class Functions {
     public static void initFragment(Context context, FragmentMainBinding binding, int which) {
         RecyclerView recyclerView = binding.mainList;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        SwipeRefreshLayout swipeRefreshLayout = binding.mainRefresh;
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
         Database database = new Database(context);
-        ArrayList<HashMap<String, String>> data = null;
+        String filter = null;
+        String location = null;
         switch (which) {
             case R.string.browse:
-                data = database.getRows(null, null);
                 break;
             case R.string.around:
-                //data = database.getRows();
+                //location = ;
                 break;
             case R.string.news:
-                data = database.getRows("actualite", null);
+                filter = "actualite";
                 break;
             case R.string.popularization:
-                data = database.getRows("vulgarisation", null);
+                filter = "vulgarisation";
                 break;
             case R.string.digital:
-                data = database.getRows("numerique", null);
+                filter = "numerique";
                 break;
             case R.string.science:
-                data = database.getRows("science", null);
+                filter = "science";
                 break;
             case R.string.culture:
-                data = database.getRows("culture", null);
+                filter = "culture";
                 break;
             case R.string.history:
-                data = database.getRows("histoire", null);
+                filter = "histoire";
                 break;
             case R.string.geography:
-                data = database.getRows("geographie", null);
+                filter = "geographie";
                 break;
             case R.string.politics:
-                data = database.getRows("politique", null);
+                filter = "politique";
                 break;
             case R.string.sport:
-                data = database.getRows("sport", null);
+                filter = "sport";
                 break;
         }
+        ArrayList<HashMap<String, String>> data = database.getRows(filter, location);
         database.close();
         Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(context, data);
         recyclerView.setAdapter(recyclerViewAdapter);
+        SwipeRefreshLayout swipeRefreshLayout = binding.mainRefresh;
+        String finalFilter = filter;
+        String finalLocation = location;
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshTimeline(context, new RefreshReceiver(finalFilter, finalLocation, recyclerView, swipeRefreshLayout), "Refresh");
+            }
+        });
     }
 
     /**

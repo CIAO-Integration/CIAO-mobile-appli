@@ -43,14 +43,6 @@ public class Production extends AppCompatActivity {
      * Type of production
      */
     private String type;
-    /**
-     * Broadcast receiver for JsonFromUrl
-     */
-    private JsonReceiver jsonReceiver;
-    /**
-     * Broadcast receiver for TextFromUrl
-     */
-    private TextReceiver textReceiver;
 
     /**
      * Create Activity
@@ -79,8 +71,7 @@ public class Production extends AppCompatActivity {
                 back.setColorFilter(Color.WHITE);
                 break;
         }
-        jsonReceiver = new JsonReceiver();
-        registerReceiver(jsonReceiver, new IntentFilter(TARGET));
+        registerReceiver(new JsonReceiver(), new IntentFilter(TARGET));
         Intent intent = new Intent(this, JsonFromUrl.class);
 
         String id = getIntent().getStringExtra("id");
@@ -109,7 +100,7 @@ public class Production extends AppCompatActivity {
          */
         @Override
         public void onReceive(Context context, Intent intent) {
-            unregisterReceiver(jsonReceiver);
+            unregisterReceiver(this);
             if (intent.getStringExtra("json") != null) {
                 try {
                     JSONObject json = new JSONObject(intent.getStringExtra("json"));
@@ -122,8 +113,7 @@ public class Production extends AppCompatActivity {
                         if (type.equals("article")) {
                             actionBarTitle.setText(getString(R.string.article));
                             if (!path.equals("null")) {
-                                textReceiver = new TextReceiver();
-                                registerReceiver(textReceiver, new IntentFilter(TARGET));
+                                registerReceiver(new TextReceiver(), new IntentFilter(TARGET));
                                 Intent intent1 = new Intent(context, TextFromUrl.class);
                                 intent1.putExtra("path", BuildConfig.STORAGE_SERVER_URL + path);
                                 intent1.putExtra("target", TARGET);
@@ -173,7 +163,7 @@ public class Production extends AppCompatActivity {
          */
         @Override
         public void onReceive(Context context, Intent intent) {
-            unregisterReceiver(textReceiver);
+            unregisterReceiver(this);
             String text = intent.getStringExtra("text");
             ArticleBuilder articleBuilder = new ArticleBuilder(context, findViewById(R.id.article_content), text);
             articleBuilder.build();

@@ -80,15 +80,15 @@ public class ArticleBuilder {
     /**
      * Context
      */
-    private Context context;
+    private final Context context;
     /**
      * Article
      */
-    private LinearLayout article;
+    private final LinearLayout article;
     /**
      * Text
      */
-    private String text;
+    private final String text;
 
     /**
      * Constructor
