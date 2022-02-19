@@ -63,4 +63,7 @@
     <string name="sort_za">Z-A</string>
     <string name="sort_az">A-Z</string>
     <string name="sort_oldest">Oldest</string>
+    <string name="error_video">Error loading video</string>
+    <string name="error_article">Error loading article</string>
+    <string name="error_network">Please check your internet connection</string>
 </resources>

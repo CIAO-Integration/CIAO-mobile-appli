@@ -16,8 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.ciao.app.Functions;
-import com.ciao.app.JsonFromUrl;
 import com.ciao.app.R;
+import com.ciao.app.service.JsonFromUrl;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONException;
@@ -64,18 +64,23 @@ public class Login extends AppCompatActivity {
      * @param view View
      */
     public void login(View view) {
-        EditText email = findViewById(R.id.login_login_email);
-        EditText password = findViewById(R.id.login_login_password);
-        Log.d("email", email.getText().toString());
-        Map<String, String> arguments = new HashMap<>();
-        arguments.put("request", "login");
-        arguments.put("email", email.getText().toString());
-        arguments.put("password", password.getText().toString());
-        registerReceiver(new LoginReceiver(), new IntentFilter(TARGET));
-        Intent intent = new Intent(this, JsonFromUrl.class);
-        intent.putExtra("arguments", (Serializable) arguments);
-        intent.putExtra("target", TARGET);
-        startService(intent);
+        Boolean connected = Functions.checkConnection(this);
+        if (connected) {
+            EditText email = findViewById(R.id.login_login_email);
+            EditText password = findViewById(R.id.login_login_password);
+            Log.d("email", email.getText().toString());
+            Map<String, String> arguments = new HashMap<>();
+            arguments.put("request", "login");
+            arguments.put("email", email.getText().toString());
+            arguments.put("password", password.getText().toString());
+            registerReceiver(new LoginReceiver(), new IntentFilter(TARGET));
+            Intent intent = new Intent(this, JsonFromUrl.class);
+            intent.putExtra("arguments", (Serializable) arguments);
+            intent.putExtra("target", TARGET);
+            startService(intent);
+        } else {
+            Functions.showErrorDialog(this, getString(R.string.error_network));
+        }
     }
 
     /**
@@ -84,23 +89,28 @@ public class Login extends AppCompatActivity {
      * @param view View
      */
     public void register(View view) {
-        EditText username = findViewById(R.id.login_register_username);
-        EditText email = findViewById(R.id.login_register_email);
-        EditText password = findViewById(R.id.login_register_password);
-        EditText confirmPassword = findViewById(R.id.login_register_confirm_password);
-        Log.d("username", username.getText().toString());
-        Log.d("email", email.getText().toString());
-        Map<String, String> arguments = new HashMap<>();
-        arguments.put("request", "register");
-        arguments.put("username", username.getText().toString());
-        arguments.put("email", email.getText().toString());
-        arguments.put("password", password.getText().toString());
-        arguments.put("conf_password", confirmPassword.getText().toString());
-        registerReceiver(new RegisterReceiver(), new IntentFilter(TARGET));
-        Intent intent = new Intent(this, JsonFromUrl.class);
-        intent.putExtra("arguments", (Serializable) arguments);
-        intent.putExtra("target", TARGET);
-        startService(intent);
+        Boolean connected = Functions.checkConnection(this);
+        if (connected) {
+            EditText username = findViewById(R.id.login_register_username);
+            EditText email = findViewById(R.id.login_register_email);
+            EditText password = findViewById(R.id.login_register_password);
+            EditText confirmPassword = findViewById(R.id.login_register_confirm_password);
+            Log.d("username", username.getText().toString());
+            Log.d("email", email.getText().toString());
+            Map<String, String> arguments = new HashMap<>();
+            arguments.put("request", "register");
+            arguments.put("username", username.getText().toString());
+            arguments.put("email", email.getText().toString());
+            arguments.put("password", password.getText().toString());
+            arguments.put("conf_password", confirmPassword.getText().toString());
+            registerReceiver(new RegisterReceiver(), new IntentFilter(TARGET));
+            Intent intent = new Intent(this, JsonFromUrl.class);
+            intent.putExtra("arguments", (Serializable) arguments);
+            intent.putExtra("target", TARGET);
+            startService(intent);
+        } else {
+            Functions.showErrorDialog(this, getString(R.string.error_network));
+        }
     }
 
     /**
@@ -179,6 +189,7 @@ public class Login extends AppCompatActivity {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Functions.showErrorDialog(context, e.toString());
                 }
             }
         }
@@ -214,6 +225,7 @@ public class Login extends AppCompatActivity {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Functions.showErrorDialog(context, e.toString());
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.ciao.app.activity;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,9 +23,9 @@ import androidx.cardview.widget.CardView;
 import com.ciao.app.ArticleBuilder;
 import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
-import com.ciao.app.JsonFromUrl;
 import com.ciao.app.R;
-import com.ciao.app.TextFromUrl;
+import com.ciao.app.service.JsonFromUrl;
+import com.ciao.app.service.TextFromUrl;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +50,10 @@ public class Production extends AppCompatActivity {
      * Link to the web version
      */
     private String link;
+    /**
+     * Progress dialog
+     */
+    private Dialog progressDialog;
 
     /**
      * Create Activity
@@ -93,7 +98,6 @@ public class Production extends AppCompatActivity {
         CardView cardView = findViewById(R.id.actionbar_cardview);
         cardView.setElevation(0);
 
-        registerReceiver(new ProductionReceiver(), new IntentFilter(TARGET));
 
         String id = getIntent().getStringExtra("id");
         if (id.startsWith("art")) {
@@ -102,13 +106,21 @@ public class Production extends AppCompatActivity {
             type = "video";
         }
 
-        Map<String, String> arguments = new HashMap<>();
-        arguments.put("request", "production");
-        arguments.put("id", id);
-        Intent intent = new Intent(this, JsonFromUrl.class);
-        intent.putExtra("arguments", (Serializable) arguments);
-        intent.putExtra("target", TARGET);
-        startService(intent);
+        Boolean connected = Functions.checkConnection(this);
+        if (connected) {
+            registerReceiver(new ProductionReceiver(), new IntentFilter(TARGET));
+            Map<String, String> arguments = new HashMap<>();
+            arguments.put("request", "production");
+            arguments.put("id", id);
+            Intent intent = new Intent(this, JsonFromUrl.class);
+            intent.putExtra("arguments", (Serializable) arguments);
+            intent.putExtra("target", TARGET);
+            startService(intent);
+            progressDialog = Functions.makeLoadingDialog(this);
+            progressDialog.show();
+        } else {
+            Functions.showErrorDialog(this, getString(R.string.error_network));
+        }
     }
 
     /**
@@ -155,22 +167,34 @@ public class Production extends AppCompatActivity {
                                     path = BuildConfig.STORAGE_SERVER_URL + path;
                                 }
                                 videoView.setVideoPath(path);
+                                videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                                    @Override
+                                    public boolean onError(MediaPlayer mp, int what, int extra) {
+                                        progressDialog.cancel();
+                                        Functions.showErrorDialog(context, getString(R.string.error_video));
+                                        return true;
+                                    }
+                                });
                                 videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                                     @Override
                                     public void onPrepared(MediaPlayer mediaPlayer) {
                                         MediaController mediaController = new MediaController(context);
                                         videoView.setMediaController(mediaController);
                                         mediaController.setAnchorView(videoView);
+                                        progressDialog.cancel();
                                         videoView.start();
                                     }
                                 });
                             }
                         }
                     } else {
+                        progressDialog.cancel();
                         Functions.showErrorDialog(context, getString(R.string.error_message, status, json.getString("message")));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    progressDialog.cancel();
+                    Functions.showErrorDialog(context, e.toString());
                 }
             }
         }
@@ -190,8 +214,14 @@ public class Production extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             unregisterReceiver(this);
             String text = intent.getStringExtra("text");
-            ArticleBuilder articleBuilder = new ArticleBuilder(context, findViewById(R.id.article_content), text);
-            articleBuilder.build();
+            if (text == null) {
+                progressDialog.cancel();
+                Functions.showErrorDialog(context, getString(R.string.error_article));
+            } else {
+                ArticleBuilder articleBuilder = new ArticleBuilder(context, findViewById(R.id.article_content), text);
+                articleBuilder.build();
+                progressDialog.cancel();
+            }
         }
     }
 }

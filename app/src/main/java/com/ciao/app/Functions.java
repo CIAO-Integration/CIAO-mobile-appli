@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.view.Gravity;
 import android.view.View;
@@ -25,6 +27,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.ciao.app.activity.Main;
 import com.ciao.app.databinding.FragmentMainBinding;
+import com.ciao.app.service.JsonFromUrl;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -290,5 +293,17 @@ public class Functions {
         builder.setView(linearLayout);
         builder.setCancelable(false);
         return builder.create();
+    }
+
+    /**
+     * Check connection
+     *
+     * @param context Context
+     * @return Connected
+     */
+    public static Boolean checkConnection(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 }

@@ -280,9 +280,14 @@ public class Main extends AppCompatActivity {
             holder.card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(context, Production.class);
-                    intent.putExtra("id", id);
-                    context.startActivity(intent);
+                    Boolean connected = Functions.checkConnection(context);
+                    if (connected) {
+                        Intent intent = new Intent(context, Production.class);
+                        intent.putExtra("id", id);
+                        context.startActivity(intent);
+                    } else {
+                        Functions.showErrorDialog(context, context.getString(R.string.error_network));
+                    }
                 }
             });
         }
@@ -405,6 +410,7 @@ public class Main extends AppCompatActivity {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Functions.showErrorDialog(context, e.toString());
                 }
             }
             swipeRefreshLayout.setRefreshing(false);

@@ -1,4 +1,4 @@
-package com.ciao.app;
+package com.ciao.app.service;
 
 import android.app.Service;
 import android.content.Intent;

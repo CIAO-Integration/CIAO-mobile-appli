@@ -1,4 +1,4 @@
-package com.ciao.app;
+package com.ciao.app.service;
 
 import android.app.Service;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.ciao.app.BuildConfig;
 
 import java.util.Map;
 

@@ -12,8 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.ciao.app.Functions;
-import com.ciao.app.JsonFromUrl;
 import com.ciao.app.R;
+import com.ciao.app.service.JsonFromUrl;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,29 +56,34 @@ public class Loading extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sharedPreferences.edit();
 
-        Boolean firstTime = sharedPreferences.getBoolean("firstTime", true);
-        if (firstTime) {
-            finish();
-            startActivity(new Intent(this, Login.class));
-        }
-
         String theme = sharedPreferences.getString("theme", "light");
         Functions.setTheme(theme);
 
-        setContentView(R.layout.activity_loading);
-
-        String key = sharedPreferences.getString("key", null);
-        if (key != null) {
-            Map<String, String> arguments = new HashMap<>();
-            arguments.put("request", "userInfo");
-            arguments.put("key", key);
-            registerReceiver(new UserInfoReceiver(), new IntentFilter(USERINFO_TARGET));
-            Intent intent = new Intent(this, JsonFromUrl.class);
-            intent.putExtra("arguments", (Serializable) arguments);
-            intent.putExtra("target", USERINFO_TARGET);
-            startService(intent);
+        Boolean firstTime = sharedPreferences.getBoolean("firstTime", true);
+        if (firstTime) {
+            startActivity(new Intent(this, Login.class));
+            finish();
         } else {
-            Functions.refreshTimeline(this, new TimelineReceiver(), TIMELINE_TARGET);
+            setContentView(R.layout.activity_loading);
+
+            Boolean connected = Functions.checkConnection(this);
+            if (connected) {
+                String key = sharedPreferences.getString("key", null);
+                if (key != null) {
+                    Map<String, String> arguments = new HashMap<>();
+                    arguments.put("request", "userInfo");
+                    arguments.put("key", key);
+                    registerReceiver(new UserInfoReceiver(), new IntentFilter(USERINFO_TARGET));
+                    Intent intent = new Intent(this, JsonFromUrl.class);
+                    intent.putExtra("arguments", (Serializable) arguments);
+                    intent.putExtra("target", USERINFO_TARGET);
+                    startService(intent);
+                } else {
+                    Functions.refreshTimeline(this, new TimelineReceiver(), TIMELINE_TARGET);
+                }
+            } else {
+                Functions.showErrorDialog(this, getString(R.string.error_network));
+            }
         }
     }
 
@@ -109,6 +114,7 @@ public class Loading extends AppCompatActivity {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Functions.showErrorDialog(context, e.toString());
                 }
             }
         }
@@ -163,6 +169,7 @@ public class Loading extends AppCompatActivity {
                     editor.apply();
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Functions.showErrorDialog(context, e.toString());
                 }
             }
             Functions.refreshTimeline(context, new TimelineReceiver(), TIMELINE_TARGET);

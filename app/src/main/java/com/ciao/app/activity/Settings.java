@@ -33,9 +33,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
-import com.ciao.app.Gps;
-import com.ciao.app.JsonFromUrl;
 import com.ciao.app.R;
+import com.ciao.app.service.Gps;
+import com.ciao.app.service.JsonFromUrl;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
@@ -344,12 +344,17 @@ public class Settings extends AppCompatActivity {
          * Get location from GPS sensor
          */
         public void getLocation() {
-            progressDialog = Functions.makeLoadingDialog(context);
-            progressDialog.show();
-            context.registerReceiver(new GpsReceiver(), new IntentFilter(GPS_TARGET));
-            Intent intent = new Intent(context, Gps.class);
-            intent.putExtra("target", GPS_TARGET);
-            context.startService(intent);
+            Boolean connected = Functions.checkConnection(context);
+            if (connected) {
+                progressDialog = Functions.makeLoadingDialog(context);
+                progressDialog.show();
+                context.registerReceiver(new GpsReceiver(), new IntentFilter(GPS_TARGET));
+                Intent intent = new Intent(context, Gps.class);
+                intent.putExtra("target", GPS_TARGET);
+                context.startService(intent);
+            } else {
+                Functions.showErrorDialog(context, getString(R.string.error_network));
+            }
         }
 
         /**
@@ -384,8 +389,9 @@ public class Settings extends AppCompatActivity {
                     context.startService(intent1);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Functions.showErrorDialog(context, e.toString());
                 }
-                progressDialog.dismiss();
+                progressDialog.cancel();
             }
         }
     }

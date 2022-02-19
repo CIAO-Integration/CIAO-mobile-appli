@@ -1,4 +1,4 @@
-package com.ciao.app;
+package com.ciao.app.service;
 
 import android.annotation.SuppressLint;
 import android.app.Service;

@@ -63,4 +63,7 @@
     <string name="sort_az">A-Z</string>
     <string name="sort_oldest">Les plus ancients</string>
     <string name="sort_za">Z-A</string>
+    <string name="error_video">Erreur lors du chargement de la vidéo</string>
+    <string name="error_article">Erreur lors du chargement de l\'article</string>
+    <string name="error_network">Veuillez vérifier votre connexion à internet</string>
 </resources>
