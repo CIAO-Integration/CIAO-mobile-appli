@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.ciao.app.Database;
 import com.ciao.app.R;
@@ -32,6 +33,9 @@ public class Search extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.main_refresh);
+        swipeRefreshLayout.setEnabled(false);
 
         Intent intent = getIntent();
         String search = intent.getStringExtra("search");

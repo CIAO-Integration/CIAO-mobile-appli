@@ -8,8 +8,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.view.Gravity;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -27,7 +31,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +51,7 @@ public class Functions {
      * @param which   Which Fragment
      */
     public static void initFragment(Context context, FragmentMainBinding binding, int which) {
+        Spinner spinner = binding.mainSort;
         RecyclerView recyclerView = binding.mainList;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         Database database = new Database(context);
@@ -92,7 +101,77 @@ public class Functions {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshTimeline(context, new Main.RefreshReceiver(finalFilter, finalLocation, recyclerView, swipeRefreshLayout), "Refresh");
+                refreshTimeline(context, new Main.RefreshReceiver(finalFilter, finalLocation, recyclerView, swipeRefreshLayout, spinner), "Refresh");
+            }
+        });
+
+        spinner.setAdapter(ArrayAdapter.createFromResource(context, R.array.sort, android.R.layout.simple_spinner_item));
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Main.RecyclerViewAdapter recyclerViewAdapter = (Main.RecyclerViewAdapter) recyclerView.getAdapter();
+                ArrayList<HashMap<String, String>> data = recyclerViewAdapter.getData();
+
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                switch (position) {
+                    case 0:
+                        Collections.sort(data, new Comparator<HashMap<String, String>>() {
+                            @Override
+                            public int compare(HashMap<String, String> o1, HashMap<String, String> o2) {
+                                long date1 = 0;
+                                long date2 = 0;
+                                try {
+                                    date1 = simpleDateFormat.parse(o1.get("date")).getTime();
+                                    date2 = simpleDateFormat.parse(o2.get("date")).getTime();
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                                return (int) (date2 - date1);
+                            }
+                        });
+                        break;
+                    case 1:
+                        Collections.sort(data, new Comparator<HashMap<String, String>>() {
+                            @Override
+                            public int compare(HashMap<String, String> o1, HashMap<String, String> o2) {
+                                long date1 = 0;
+                                long date2 = 0;
+                                try {
+                                    date1 = simpleDateFormat.parse(o1.get("date")).getTime();
+                                    date2 = simpleDateFormat.parse(o2.get("date")).getTime();
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                                return (int) (date1 - date2);
+                            }
+                        });
+                        break;
+                    case 2:
+                        Collections.sort(data, new Comparator<HashMap<String, String>>() {
+                            @Override
+                            public int compare(HashMap<String, String> o1, HashMap<String, String> o2) {
+                                String title1 = o1.get("title");
+                                String title2 = o2.get("title");
+                                return title1.compareTo(title2);
+                            }
+                        });
+                        break;
+                    case 3:
+                        Collections.sort(data, new Comparator<HashMap<String, String>>() {
+                            @Override
+                            public int compare(HashMap<String, String> o1, HashMap<String, String> o2) {
+                                String title1 = o1.get("title");
+                                String title2 = o2.get("title");
+                                return title2.compareTo(title1);
+                            }
+                        });
+                        break;
+                }
+                recyclerView.setAdapter(new Main.RecyclerViewAdapter(context, data));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
     }

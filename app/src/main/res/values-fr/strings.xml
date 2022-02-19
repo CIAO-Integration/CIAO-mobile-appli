@@ -59,4 +59,8 @@
     <string name="loading">Chargement</string>
     <string name="loading_message">Veuillez patienter...</string>
     <string name="search_results">Résultats pour \"%1$s\"</string>
+    <string name="sort_latest">Les plus récents</string>
+    <string name="sort_az">A-Z</string>
+    <string name="sort_oldest">Les plus ancients</string>
+    <string name="sort_za">Z-A</string>
 </resources>

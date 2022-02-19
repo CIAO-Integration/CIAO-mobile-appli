@@ -59,4 +59,8 @@
     <string name="loading">Loading</string>
     <string name="loading_message">Please wait...</string>
     <string name="search_results">Results for \"%1$s\"</string>
+    <string name="sort_latest">Latest</string>
+    <string name="sort_za">Z-A</string>
+    <string name="sort_az">A-Z</string>
+    <string name="sort_oldest">Oldest</string>
 </resources>

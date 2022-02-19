@@ -31,4 +31,11 @@
         <item>"Provence-Alpes-Côte d’Azur",France</item>
         <item>"Réunion",France</item>
     </string-array>
+
+    <string-array name="sort">
+        <item>@string/sort_latest</item>
+        <item>@string/sort_oldest</item>
+        <item>@string/sort_az</item>
+        <item>@string/sort_za</item>
+    </string-array>
 </resources>

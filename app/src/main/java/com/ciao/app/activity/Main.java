@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -147,6 +149,15 @@ public class Main extends AppCompatActivity {
                 Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
             }
         }
+
+        EditText editText = navigationView.getHeaderView(0).findViewById(R.id.main_searchBar);
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                search(v.getText().toString());
+                return false;
+            }
+        });
     }
 
     /**
@@ -192,6 +203,17 @@ public class Main extends AppCompatActivity {
         String text = editText.getText().toString();
         Intent intent = new Intent(this, Search.class);
         intent.putExtra("search", text);
+        startActivity(intent);
+    }
+
+    /**
+     * Search
+     *
+     * @param search Search
+     */
+    public void search(String search) {
+        Intent intent = new Intent(this, Search.class);
+        intent.putExtra("search", search);
         startActivity(intent);
     }
 
@@ -276,6 +298,15 @@ public class Main extends AppCompatActivity {
         }
 
         /**
+         * Get data
+         *
+         * @return Data
+         */
+        public ArrayList<HashMap<String, String>> getData() {
+            return data;
+        }
+
+        /**
          * ViewHolder
          */
         private class ViewHolder extends RecyclerView.ViewHolder {
@@ -327,6 +358,10 @@ public class Main extends AppCompatActivity {
          * Swipe refresh layout
          */
         private final SwipeRefreshLayout swipeRefreshLayout;
+        /**
+         * Spinner
+         */
+        private final Spinner spinner;
 
         /**
          * Constructor
@@ -335,12 +370,14 @@ public class Main extends AppCompatActivity {
          * @param location           Location
          * @param recyclerView       RecyclerView
          * @param swipeRefreshLayout SwiperRefreshLayout
+         * @param spinner            Spinner
          */
-        public RefreshReceiver(String filter, String location, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout) {
+        public RefreshReceiver(String filter, String location, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout, Spinner spinner) {
             this.filter = filter;
             this.location = location;
             this.recyclerView = recyclerView;
             this.swipeRefreshLayout = swipeRefreshLayout;
+            this.spinner = spinner;
         }
 
         /**
@@ -371,6 +408,7 @@ public class Main extends AppCompatActivity {
                 }
             }
             swipeRefreshLayout.setRefreshing(false);
+            spinner.setSelection(0);
         }
     }
 }

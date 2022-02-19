@@ -87,6 +87,7 @@ public class Database extends SQLiteOpenHelper {
 
     /**
      * Get rows of database
+     *
      * @return Rows
      */
     public ArrayList<HashMap<String, String>> getRows() {
@@ -117,11 +118,11 @@ public class Database extends SQLiteOpenHelper {
      * @return Rows
      */
     public ArrayList<HashMap<String, String>> getRowsByFilter(String filter, String location) {
-        String query = "SELECT * FROM " + TABLE_NAME;
+        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY date DESC";
         if (location != null) {
-            query = "SELECT * FROM " + TABLE_NAME + " WHERE location LIKE '%" + location + "%'";
+            query = "SELECT * FROM " + TABLE_NAME + " WHERE location LIKE '%" + location + "%' ORDER BY date DESC";
         } else if (filter != null) {
-            query = "SELECT * FROM " + TABLE_NAME + " WHERE tags LIKE '%" + filter + "%'";
+            query = "SELECT * FROM " + TABLE_NAME + " WHERE tags LIKE '%" + filter + "%' ORDER BY date DESC";
         }
         ArrayList<HashMap<String, String>> rows = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
@@ -143,14 +144,15 @@ public class Database extends SQLiteOpenHelper {
 
     /**
      * Get rows of database by title
+     *
      * @param search Search
      * @return Rows
      */
     public ArrayList<HashMap<String, String>> getRowsBySearch(String search) {
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE title LIKE '%" + search + "%' OR tags LIKE '%" + search + "%' OR id LIKE '%" + search + "%' OR date LIKE '%" + search + "%' OR location LIKE '%" + search + "%'";
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE title LIKE ? OR tags LIKE ? OR id LIKE ? OR date LIKE ? OR location LIKE ?";
         ArrayList<HashMap<String, String>> rows = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
+        Cursor cursor = db.rawQuery(query, new String[]{"%" + search + "%", "%" + search + "%", "%" + search + "%", "%" + search + "%", "%" + search + "%"});
         while (cursor.moveToNext()) {
             HashMap<String, String> row = new HashMap<>();
             row.put("id", cursor.getString(0));
