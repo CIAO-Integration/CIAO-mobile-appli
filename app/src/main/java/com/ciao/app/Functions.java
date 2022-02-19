@@ -1,18 +1,25 @@
 package com.ciao.app;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.view.Gravity;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.ciao.app.activity.Main;
-import com.ciao.app.activity.MainFragment.RefreshReceiver;
 import com.ciao.app.databinding.FragmentMainBinding;
 
 import org.json.JSONArray;
@@ -45,7 +52,7 @@ public class Functions {
             case R.string.browse:
                 break;
             case R.string.around:
-                //location = ;
+                location = PreferenceManager.getDefaultSharedPreferences(context).getString("location", null);
                 break;
             case R.string.news:
                 filter = "actualite";
@@ -85,7 +92,7 @@ public class Functions {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshTimeline(context, new RefreshReceiver(finalFilter, finalLocation, recyclerView, swipeRefreshLayout), "Refresh");
+                refreshTimeline(context, new Main.RefreshReceiver(finalFilter, finalLocation, recyclerView, swipeRefreshLayout), "Refresh");
             }
         });
     }
@@ -162,5 +169,47 @@ public class Functions {
         Uri uri = Uri.parse(url);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         context.startActivity(intent);
+    }
+
+    /**
+     * Show error dialog
+     *
+     * @param context Context
+     * @param message Message
+     */
+    public static void showErrorDialog(Context context, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(context.getString(R.string.error));
+        builder.setMessage(message);
+        builder.setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    /**
+     * Make progress dialog
+     *
+     * @param context Context
+     * @return Progress dialog
+     */
+    public static Dialog makeLoadingDialog(Context context) {
+        ProgressBar progressBar = new ProgressBar(context);
+        progressBar.setIndeterminate(true);
+        TextView textView = new TextView(context);
+        textView.setText(context.getString(R.string.loading_message));
+        LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.addView(progressBar);
+        linearLayout.addView(textView);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(context.getString(R.string.loading));
+        builder.setView(linearLayout);
+        builder.setCancelable(false);
+        return builder.create();
     }
 }

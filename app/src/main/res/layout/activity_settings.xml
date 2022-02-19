@@ -23,6 +23,7 @@
                 android:layout_width="?attr/actionBarSize"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
                 app:srcCompat="@drawable/no_avatar" />
         </androidx.cardview.widget.CardView>
 

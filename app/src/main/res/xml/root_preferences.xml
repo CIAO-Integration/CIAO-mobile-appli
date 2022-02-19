@@ -14,24 +14,33 @@
             app:title="@string/theme"
             app:useSimpleSummaryProvider="true" />
 
-        <ListPreference
-            app:defaultValue="disabled"
-            app:entries="@array/location_entries"
-            app:entryValues="@array/location_values"
-            app:iconSpaceReserved="false"
-            app:key="location_mode"
-            app:title="@string/location"
-            app:useSimpleSummaryProvider="true" />
-
     </PreferenceCategory>
-    <!--<PreferenceCategory
+    <PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/account">
         <Preference
             app:iconSpaceReserved="false"
-            app:summary="currently connected as xxx"
-            app:title="Disconnect" />
-    </PreferenceCategory>-->
+            app:key="login"
+            app:summary="@string/login_register_summary"
+            app:title="@string/login_register" />
+        <SwitchPreference
+            app:defaultValue="false"
+            app:iconSpaceReserved="false"
+            app:key="location_mode"
+            app:summary="@string/location_summary"
+            app:title="@string/location" />
+        <Preference
+            app:entries="@array/location"
+            app:entryValues="@array/location"
+            app:iconSpaceReserved="false"
+            app:key="location"
+            app:title="@string/set_location" />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="logout"
+            app:summary="@string/logout_summary"
+            app:title="@string/logout" />
+    </PreferenceCategory>
     <PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/about">

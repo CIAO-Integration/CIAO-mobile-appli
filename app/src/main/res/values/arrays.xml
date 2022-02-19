@@ -11,17 +11,24 @@
         <item>dark</item>
     </string-array>
 
-    <string-array name="location_entries">
-        <item>@string/disabled</item>
-        <item>@string/gps</item>
-        <item>@string/ip</item>
-        <item>@string/manual</item>
-    </string-array>
-
-    <string-array name="location_values">
-        <item>disabled</item>
-        <item>gps</item>
-        <item>ip</item>
-        <item>manual</item>
+    <string-array name="location">
+        <item>"Auvergne-Rhône-Alpes",France</item>
+        <item>"Bourgogne-France-Comté",France</item>
+        <item>"Bretagne",France</item>
+        <item>"Centre-Val de Loire",France</item>
+        <item>"Corse",France</item>
+        <item>"Grand-Est",France</item>
+        <item>"Guadeloupe",France</item>
+        <item>"Guyane",France</item>
+        <item>"Hauts-de-France",France</item>
+        <item>"Île-de-France",France</item>
+        <item>"Martinique",France</item>
+        <item>"Mayotte",France</item>
+        <item>"Normandie",France</item>
+        <item>"Nouvelle-Aquitaine",France</item>
+        <item>"Occitanie",France</item>
+        <item>"Pays de la Loire",France</item>
+        <item>"Provence-Alpes-Côte d’Azur",France</item>
+        <item>"Réunion",France</item>
     </string-array>
 </resources>

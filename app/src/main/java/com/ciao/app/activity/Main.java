@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -25,10 +26,12 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.ciao.app.BuildConfig;
+import com.ciao.app.Database;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.google.android.material.navigation.NavigationView;
@@ -45,13 +48,13 @@ import java.util.HashMap;
  */
 public class Main extends AppCompatActivity {
     /**
-     * Target for broadcast receiver
-     */
-    public static final String TARGET = "Main";
-    /**
      * Shared preferences
      */
     private SharedPreferences sharedPreferences;
+    /**
+     * API key
+     */
+    private String key;
 
     /**
      * Create Activity
@@ -71,6 +74,7 @@ public class Main extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_main);
+        key = sharedPreferences.getString("key", null);
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -119,11 +123,6 @@ public class Main extends AppCompatActivity {
         });
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        /*if(!connected){
-            Menu menu = navigationView.getMenu();
-            menu.findItem(R.id.nav_around).setVisible(false);
-        }*/
-
         findViewById(R.id.actionbar_logo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -136,6 +135,36 @@ public class Main extends AppCompatActivity {
                 settings();
             }
         });
+
+        if (key != null) {
+            String avatar = sharedPreferences.getString("avatar", null);
+            if (avatar != null && !avatar.equals("null")) {
+                ImageView imageView = findViewById(R.id.actionbar_avatar);
+                if (!avatar.startsWith("http")) {
+                    avatar = BuildConfig.STORAGE_SERVER_URL + avatar;
+                }
+                Drawable placeholder = AppCompatResources.getDrawable(this, R.drawable.no_avatar);
+                Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+            }
+        }
+    }
+
+    /**
+     * On resume
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (key != null) {
+            Boolean location_mode = sharedPreferences.getBoolean("location_mode", false);
+            NavigationView navigationView = findViewById(R.id.nav_view);
+            Menu menu = navigationView.getMenu();
+            if (location_mode && sharedPreferences.getString("location", null) != null) {
+                menu.findItem(R.id.nav_around).setVisible(true);
+            } else {
+                menu.findItem(R.id.nav_around).setVisible(false);
+            }
+        }
     }
 
     /**
@@ -274,18 +303,52 @@ public class Main extends AppCompatActivity {
         }
     }
 
+
     /**
-     * Broadcast receiver for Json FromUrl
+     * Broadcast receiver for JsonFromUrl
      */
-    private class JsonReceiver extends BroadcastReceiver {
+    public static class RefreshReceiver extends BroadcastReceiver {
         /**
+         * Timeline filter
+         */
+        private final String filter;
+        /**
+         * Timeline location
+         */
+        private final String location;
+        /**
+         * Recycler view
+         */
+        private final RecyclerView recyclerView;
+        /**
+         * Swipe refresh layout
+         */
+        private final SwipeRefreshLayout swipeRefreshLayout;
+
+        /**
+         * Constructor
+         *
+         * @param filter             Filter
+         * @param location           Location
+         * @param recyclerView       RecyclerView
+         * @param swipeRefreshLayout SwiperRefreshLayout
+         */
+        public RefreshReceiver(String filter, String location, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout) {
+            this.filter = filter;
+            this.location = location;
+            this.recyclerView = recyclerView;
+            this.swipeRefreshLayout = swipeRefreshLayout;
+        }
+
+        /**
+         * On receive
+         *
          * @param context Context
          * @param intent  Intent
          */
         @Override
         public void onReceive(Context context, Intent intent) {
-            //cancel load
-            unregisterReceiver(this);
+            context.unregisterReceiver(this);
             if (intent.getStringExtra("json") != null) {
                 try {
                     JSONObject json = new JSONObject(intent.getStringExtra("json"));
@@ -293,13 +356,18 @@ public class Main extends AppCompatActivity {
                     if (status.equals("200")) {
                         JSONArray array = json.getJSONArray("list");
                         Functions.storeTimeline(context, array);
+                        Database database = new Database(context);
+                        Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(context, database.getRows(filter, location));
+                        database.close();
+                        recyclerView.setAdapter(recyclerViewAdapter);
                     } else {
-                        //error
+                        Functions.showErrorDialog(context, context.getString(R.string.error_message, status, json.getString("message")));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 }

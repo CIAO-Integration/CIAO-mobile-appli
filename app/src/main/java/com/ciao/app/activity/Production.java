@@ -20,6 +20,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 
 import com.ciao.app.ArticleBuilder;
 import com.ciao.app.BuildConfig;
+import com.ciao.app.Functions;
 import com.ciao.app.JsonFromUrl;
 import com.ciao.app.R;
 import com.ciao.app.TextFromUrl;
@@ -38,7 +39,7 @@ public class Production extends AppCompatActivity {
     /**
      * Target for broadcast receiver
      */
-    public static final String TARGET = "Article";
+    public static final String TARGET = "Production";
     /**
      * Type of production
      */
@@ -71,8 +72,7 @@ public class Production extends AppCompatActivity {
                 back.setColorFilter(Color.WHITE);
                 break;
         }
-        registerReceiver(new JsonReceiver(), new IntentFilter(TARGET));
-        Intent intent = new Intent(this, JsonFromUrl.class);
+        registerReceiver(new ProductionReceiver(), new IntentFilter(TARGET));
 
         String id = getIntent().getStringExtra("id");
         if (id.startsWith("art")) {
@@ -80,9 +80,11 @@ public class Production extends AppCompatActivity {
         } else if (id.startsWith("vid")) {
             type = "video";
         }
-        Map<String, String> arguments = new HashMap();
+
+        Map<String, String> arguments = new HashMap<>();
         arguments.put("request", "production");
         arguments.put("id", id);
+        Intent intent = new Intent(this, JsonFromUrl.class);
         intent.putExtra("arguments", (Serializable) arguments);
         intent.putExtra("target", TARGET);
         startService(intent);
@@ -91,7 +93,7 @@ public class Production extends AppCompatActivity {
     /**
      * Broadcast receiver for JsonFromUrl
      */
-    private class JsonReceiver extends BroadcastReceiver {
+    private class ProductionReceiver extends BroadcastReceiver {
         /**
          * On receive
          *
@@ -142,7 +144,7 @@ public class Production extends AppCompatActivity {
                             }
                         }
                     } else {
-                        //error
+                        Functions.showErrorDialog(context, getString(R.string.error_message, status, json.getString("message")));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
