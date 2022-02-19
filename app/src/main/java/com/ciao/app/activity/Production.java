@@ -17,6 +17,7 @@ import android.widget.VideoView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.cardview.widget.CardView;
 
 import com.ciao.app.ArticleBuilder;
 import com.ciao.app.BuildConfig;
@@ -44,6 +45,10 @@ public class Production extends AppCompatActivity {
      * Type of production
      */
     private String type;
+    /**
+     * Link to the web version
+     */
+    private String link;
 
     /**
      * Create Activity
@@ -55,7 +60,6 @@ public class Production extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_production);
 
-        findViewById(R.id.actionbar_avatar).setVisibility(View.GONE);
         ImageView back = findViewById(R.id.actionbar_logo);
         back.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.back));
         back.setOnClickListener(new View.OnClickListener() {
@@ -64,14 +68,31 @@ public class Production extends AppCompatActivity {
                 finish();
             }
         });
+        ImageView share = findViewById(R.id.actionbar_avatar);
+        share.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.share));
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_TEXT, link);
+                intent.setType("text/plain");
+                startActivity(Intent.createChooser(intent, null));
+            }
+        });
         switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
             case Configuration.UI_MODE_NIGHT_YES:
                 back.setColorFilter(Color.LTGRAY);
+                share.setColorFilter(Color.LTGRAY);
                 break;
             case Configuration.UI_MODE_NIGHT_NO:
                 back.setColorFilter(Color.WHITE);
+                share.setColorFilter(Color.WHITE);
                 break;
         }
+        CardView cardView = findViewById(R.id.actionbar_cardview);
+        cardView.setElevation(0);
+
         registerReceiver(new ProductionReceiver(), new IntentFilter(TARGET));
 
         String id = getIntent().getStringExtra("id");
@@ -110,6 +131,7 @@ public class Production extends AppCompatActivity {
                     if (status.equals("200")) {
                         String path = json.getString("path");
                         String title = json.getString("title");
+                        link = json.getString("link");
 
                         TextView actionBarTitle = findViewById(R.id.actionbar_title);
                         if (type.equals("article")) {
@@ -139,6 +161,7 @@ public class Production extends AppCompatActivity {
                                         MediaController mediaController = new MediaController(context);
                                         videoView.setMediaController(mediaController);
                                         mediaController.setAnchorView(videoView);
+                                        videoView.start();
                                     }
                                 });
                             }
