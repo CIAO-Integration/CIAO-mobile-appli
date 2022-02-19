@@ -5,20 +5,29 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.MediaController;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.cardview.widget.CardView;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.ciao.app.ArticleBuilder;
 import com.ciao.app.BuildConfig;
@@ -54,6 +63,18 @@ public class Production extends AppCompatActivity {
      * Progress dialog
      */
     private Dialog progressDialog;
+    /**
+     * Video view
+     */
+    private VideoView videoView;
+    /**
+     * Production
+     */
+    private LinearLayout production;
+    /**
+     * Video
+     */
+    private LinearLayout video;
 
     /**
      * Create Activity
@@ -64,6 +85,10 @@ public class Production extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_production);
+
+        videoView = findViewById(R.id.video_content);
+        production = findViewById(R.id.production);
+        video = findViewById(R.id.video);
 
         String id = getIntent().getStringExtra("id");
         if (id.startsWith("art")) {
@@ -119,6 +144,66 @@ public class Production extends AppCompatActivity {
         } else {
             Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
         }
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            WindowInsetsControllerCompat windowInsetsController = ViewCompat.getWindowInsetsController(getWindow().getDecorView());
+            windowInsetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
+            video.removeView(videoView);
+            production.addView(videoView, 0);
+        }
+    }
+
+    /**
+     * On rotation changed
+     *
+     * @param newConfig New configuration
+     */
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (type.equals("video")) {
+            int orientation = newConfig.orientation;
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE || orientation == Configuration.ORIENTATION_PORTRAIT) {
+                int position = videoView.getCurrentPosition();
+                WindowInsetsControllerCompat windowInsetsController = ViewCompat.getWindowInsetsController(getWindow().getDecorView());
+                windowInsetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
+                    video.removeView(videoView);
+                    production.addView(videoView, 0);
+                } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    windowInsetsController.show(WindowInsetsCompat.Type.systemBars());
+                    production.removeView(videoView);
+                    video.addView(videoView, video.getChildCount());
+                }
+                videoView.seekTo(position);
+            }
+        }
+    }
+
+    /**
+     * Rotate screen
+     */
+    public void rotate() {
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                }
+            }, 2500);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                }
+            }, 2500);
+        }
     }
 
     /**
@@ -159,8 +244,7 @@ public class Production extends AppCompatActivity {
                             videoTitle.setText(title);
                             if (!path.equals("null")) {
                                 findViewById(R.id.article).setVisibility(View.GONE);
-                                findViewById(R.id.video).setVisibility(View.VISIBLE);
-                                VideoView videoView = findViewById(R.id.video_content);
+                                video.setVisibility(View.VISIBLE);
                                 if (!path.startsWith("http")) {
                                     path = BuildConfig.STORAGE_SERVER_URL + path;
                                 }
@@ -176,7 +260,7 @@ public class Production extends AppCompatActivity {
                                 videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                                     @Override
                                     public void onPrepared(MediaPlayer mediaPlayer) {
-                                        MediaController mediaController = new MediaController(context);
+                                        Production.MediaController mediaController = new Production.MediaController(context);
                                         videoView.setMediaController(mediaController);
                                         mediaController.setAnchorView(videoView);
                                         progressDialog.cancel();
@@ -220,6 +304,47 @@ public class Production extends AppCompatActivity {
                 articleBuilder.build();
                 progressDialog.cancel();
             }
+        }
+    }
+
+    /**
+     * Media controller
+     */
+    private class MediaController extends android.widget.MediaController {
+        /**
+         * Context
+         */
+        private Context context;
+
+        /**
+         * Constructor
+         *
+         * @param context Context
+         */
+        public MediaController(Context context) {
+            super(context);
+            this.context = context;
+        }
+
+        /**
+         * Set anchor view
+         *
+         * @param view View
+         */
+        @Override
+        public void setAnchorView(View view) {
+            super.setAnchorView(view);
+            Button button = new Button(context, null, R.attr.borderlessButtonStyle);
+            button.setForeground(AppCompatResources.getDrawable(context, android.R.drawable.ic_menu_always_landscape_portrait));
+            button.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    rotate();
+                }
+            });
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            layoutParams.gravity = Gravity.END | Gravity.TOP;
+            addView(button, layoutParams);
         }
     }
 }

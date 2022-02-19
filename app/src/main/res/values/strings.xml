@@ -65,10 +65,10 @@
     <string name="sort_oldest">Oldest</string>
     <string name="error_video">Error loading video</string>
     <string name="error_article">Error loading article</string>
-    <string name="error_network">Please check your internet connection</string>
+    <string name="error_network">Please check your internet connection, then restart CIAO</string>
     <string name="not_valid_username">Username can\'t be empty</string>
     <string name="not_valid_email">Email must look like something@domain.com</string>
-    <string name="not_valid_password">Password must be at least 8 charasters and contains at least 1 lower-case letter, 1 upper-case letter, 1 number and 1 special caracter (!*@#$&amp;)</string>
+    <string name="not_valid_password">Password must be at least 8 characters and contains at least 1 lower-case letter, 1 upper-case letter, 1 number and 1 special character (!*@#$&amp;)</string>
     <string name="not_valid_conf_password">Confirmation password must match password</string>
     <string name="error_gps">Failed retrieving your location</string>
 </resources>

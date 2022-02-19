@@ -17,7 +17,7 @@
         <activity android:name=".activity.Settings" />
         <activity
             android:name=".activity.Loading"
-            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:configChanges="orientation|screenSize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,12 +25,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.Main" />
-        <activity android:name=".activity.Production" />
+        <activity
+            android:name=".activity.Main"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activity.Production"
+            android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activity.Login"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.Search" />
+        <activity
+            android:name=".activity.Search"
+            android:configChanges="orientation|screenSize" />
 
         <service android:name=".service.JsonFromUrl" />
         <service android:name=".service.TextFromUrl" />

@@ -75,7 +75,7 @@ public class Settings extends AppCompatActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.settings, new SettingsFragment(sharedPreferences, key))
+                    .replace(R.id.settings, new SettingsFragment())
                     .commit();
         }
 
@@ -154,18 +154,6 @@ public class Settings extends AppCompatActivity {
         private Date easterEggDate = null;
 
         /**
-         * Constructor
-         *
-         * @param sharedPreferences Shared preferences
-         * @param key               API key
-         */
-        public SettingsFragment(SharedPreferences sharedPreferences, String key) {
-            this.sharedPreferences = sharedPreferences;
-            this.editor = sharedPreferences.edit();
-            this.key = key;
-        }
-
-        /**
          * Create Fragment
          *
          * @param savedInstanceState Not used
@@ -177,6 +165,9 @@ public class Settings extends AppCompatActivity {
 
             context = getContext();
             location = findPreference("location");
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            editor = sharedPreferences.edit();
+            key = sharedPreferences.getString("key", null);
             requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     Snackbar.make(getActivity().findViewById(android.R.id.content), getString(R.string.perm_granted), Snackbar.LENGTH_SHORT).show();
