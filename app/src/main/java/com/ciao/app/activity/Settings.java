@@ -196,8 +196,9 @@ public class Settings extends AppCompatActivity {
                                     }
                                     break;
                                 case 1:
+                                    String[] locations = sharedPreferences.getString("locations", "").split(";");
                                     Spinner spinner = new Spinner(context);
-                                    spinner.setAdapter(ArrayAdapter.createFromResource(context, R.array.location, android.R.layout.simple_spinner_item));
+                                    spinner.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, locations));
                                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                     builder.setView(spinner);
                                     builder.setTitle(getString(R.string.set_location));
@@ -291,6 +292,7 @@ public class Settings extends AppCompatActivity {
                     editor.remove("ci");
                     editor.remove("location");
                     editor.putBoolean("location_mode", false);
+                    editor.remove("locations");
                     editor.apply();
 
                     Map<String, String> arguments = new HashMap<>();

@@ -144,6 +144,7 @@ public class Loading extends AppCompatActivity {
                         String avatar = object.getString("avatar");
                         String location = object.getString("location");
                         String ci = object.getString("ci");
+                        String locations = object.getString("locations");
                         editor.putString("username", username);
                         editor.putString("email", email);
                         editor.putString("avatar", avatar);
@@ -155,6 +156,7 @@ public class Loading extends AppCompatActivity {
                             editor.putString("location", location);
                         }
                         editor.putString("ci", ci);
+                        editor.putString("locations", locations);
                     } else if (status.equals("401")) {
                         editor.remove("username");
                         editor.remove("email");
@@ -163,6 +165,7 @@ public class Loading extends AppCompatActivity {
                         editor.remove("ci");
                         editor.remove("location");
                         editor.remove("location_mode");
+                        editor.remove("locations");
                     } else {
                         Functions.showErrorDialog(context, getString(R.string.error_message, status, json.getString("message")));
                     }

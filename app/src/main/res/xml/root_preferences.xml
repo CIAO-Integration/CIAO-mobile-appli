@@ -30,8 +30,6 @@
             app:summary="@string/location_summary"
             app:title="@string/location" />
         <Preference
-            app:entries="@array/location"
-            app:entryValues="@array/location"
             app:iconSpaceReserved="false"
             app:key="location"
             app:title="@string/set_location" />
