@@ -57,6 +57,14 @@ public class Main extends AppCompatActivity {
      * API key
      */
     private String key;
+    /**
+     * Navigation view
+     */
+    private NavigationView navigationView;
+    /**
+     * Search bar
+     */
+    private EditText searchBar;
 
     /**
      * Create Activity
@@ -67,18 +75,13 @@ public class Main extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        Boolean firstTime = sharedPreferences.getBoolean("firstTime", true);
-        if (firstTime) {
-            finish();
-            startActivity(new Intent(this, Login.class));
-        }
-
         setContentView(R.layout.activity_main);
-        key = sharedPreferences.getString("key", null);
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        key = sharedPreferences.getString("key", null);
+        navigationView = findViewById(R.id.nav_view);
+        searchBar = navigationView.getHeaderView(0).findViewById(R.id.main_searchBar);
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
@@ -150,11 +153,10 @@ public class Main extends AppCompatActivity {
             }
         }
 
-        EditText editText = navigationView.getHeaderView(0).findViewById(R.id.main_searchBar);
-        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                search(v.getText().toString());
+                search(null);
                 return false;
             }
         });
@@ -167,10 +169,8 @@ public class Main extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (key != null) {
-            Boolean location_mode = sharedPreferences.getBoolean("location_mode", false);
-            NavigationView navigationView = findViewById(R.id.nav_view);
             Menu menu = navigationView.getMenu();
-            if (location_mode && sharedPreferences.getString("location", null) != null) {
+            if (sharedPreferences.getBoolean("location_mode", false) && sharedPreferences.getString("location", null) != null) {
                 menu.findItem(R.id.nav_around).setVisible(true);
             } else {
                 menu.findItem(R.id.nav_around).setVisible(false);
@@ -199,21 +199,8 @@ public class Main extends AppCompatActivity {
      * @param view View
      */
     public void search(View view) {
-        EditText editText = findViewById(R.id.main_searchBar);
-        String text = editText.getText().toString();
         Intent intent = new Intent(this, Search.class);
-        intent.putExtra("search", text);
-        startActivity(intent);
-    }
-
-    /**
-     * Search
-     *
-     * @param search Search
-     */
-    public void search(String search) {
-        Intent intent = new Intent(this, Search.class);
-        intent.putExtra("search", search);
+        intent.putExtra("search", searchBar.getText().toString());
         startActivity(intent);
     }
 
@@ -286,7 +273,7 @@ public class Main extends AppCompatActivity {
                         intent.putExtra("id", id);
                         context.startActivity(intent);
                     } else {
-                        Functions.showErrorDialog(context, context.getString(R.string.error_network));
+                        Functions.makeErrorDialog(context, context.getString(R.string.error_network)).show();
                     }
                 }
             });
@@ -406,11 +393,11 @@ public class Main extends AppCompatActivity {
                         database.close();
                         recyclerView.setAdapter(recyclerViewAdapter);
                     } else {
-                        Functions.showErrorDialog(context, context.getString(R.string.error_message, status, json.getString("message")));
+                        Functions.makeErrorDialog(context, context.getString(R.string.error_message, status, json.getString("message"))).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Functions.showErrorDialog(context, e.toString());
+                    Functions.makeErrorDialog(context, e.toString()).show();
                 }
             }
             swipeRefreshLayout.setRefreshing(false);

@@ -40,6 +40,8 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,15 +68,16 @@ public class Settings extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.settings, new SettingsFragment())
-                    .commit();
-        }
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         key = sharedPreferences.getString("key", null);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.settings, new SettingsFragment(sharedPreferences, key))
+                    .commit();
+        }
 
         if (key != null) {
             String avatar = sharedPreferences.getString("avatar", null);
@@ -141,6 +144,26 @@ public class Settings extends AppCompatActivity {
          * Progress dialog
          */
         private Dialog progressDialog;
+        /**
+         * Counter for easter egg
+         */
+        private int easterEggCounter = 0;
+        /**
+         * Date for easter egg
+         */
+        private Date easterEggDate = null;
+
+        /**
+         * Constructor
+         *
+         * @param sharedPreferences Shared preferences
+         * @param key               API key
+         */
+        public SettingsFragment(SharedPreferences sharedPreferences, String key) {
+            this.sharedPreferences = sharedPreferences;
+            this.editor = sharedPreferences.edit();
+            this.key = key;
+        }
 
         /**
          * Create Fragment
@@ -153,18 +176,7 @@ public class Settings extends AppCompatActivity {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
             context = getContext();
-            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            editor = sharedPreferences.edit();
-            key = sharedPreferences.getString("key", null);
-
-            Preference logout = findPreference("logout");
-            Preference login = findPreference("login");
-            Preference location_mode = findPreference("location_mode");
             location = findPreference("location");
-            Preference authors = findPreference("authors");
-            Preference source = findPreference("source");
-            Preference version = findPreference("version");
-
             requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     Snackbar.make(getActivity().findViewById(android.R.id.content), getString(R.string.perm_granted), Snackbar.LENGTH_SHORT).show();
@@ -173,10 +185,47 @@ public class Settings extends AppCompatActivity {
                     Snackbar.make(getActivity().findViewById(android.R.id.content), getString(R.string.perm_denied), Snackbar.LENGTH_SHORT).show();
                 }
             });
+            onSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                    switch (key) {
+                        case "theme":
+                            String theme = sharedPreferences.getString(key, "light");
+                            Functions.setTheme(theme);
+                            break;
+                        case "location_mode":
+                            Boolean location_mode = sharedPreferences.getBoolean("location_mode", false);
+                            if (location_mode) {
+                                location.setSummary(sharedPreferences.getString("location", context.getString(R.string.undefined)));
+                                location.setVisible(true);
+                            } else {
+                                location.setVisible(false);
+                                if (sharedPreferences.getString("location", null) != null) {
+                                    editor.remove("location");
+                                    editor.apply();
+                                    Map<String, String> arguments = new HashMap<>();
+                                    arguments.put("request", "location");
+                                    arguments.put("location", "null");
+                                    arguments.put("key", sharedPreferences.getString("key", null));
+                                    Intent intent = new Intent(context, JsonFromUrl.class);
+                                    intent.putExtra("arguments", (Serializable) arguments);
+                                    context.startService(intent);
+                                }
+                            }
+                            break;
+                    }
+                }
+            };
+
+            Preference logout = findPreference("logout");
+            Preference login = findPreference("login");
+            Preference location_mode = findPreference("location_mode");
+            Preference authors = findPreference("authors");
+            Preference source = findPreference("source");
+            Preference version = findPreference("version");
 
             location.setVisible(sharedPreferences.getBoolean("location_mode", false));
             location.setSummary(sharedPreferences.getString("location", context.getString(R.string.undefined)));
-
             location.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(@NonNull Preference preference) {
@@ -240,37 +289,6 @@ public class Settings extends AppCompatActivity {
                 }
             });
 
-            onSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-                @Override
-                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                    switch (key) {
-                        case "theme":
-                            String theme = sharedPreferences.getString(key, "light");
-                            Functions.setTheme(theme);
-                            break;
-                        case "location_mode":
-                            Boolean location_mode = sharedPreferences.getBoolean("location_mode", false);
-                            if (location_mode) {
-                                location.setSummary(sharedPreferences.getString("location", context.getString(R.string.undefined)));
-                                location.setVisible(true);
-                            } else {
-                                location.setVisible(false);
-                                if (sharedPreferences.getString("location", null) != null) {
-                                    editor.remove("location");
-                                    editor.apply();
-                                    Map<String, String> arguments = new HashMap<>();
-                                    arguments.put("request", "location");
-                                    arguments.put("location", "null");
-                                    arguments.put("key", sharedPreferences.getString("key", null));
-                                    Intent intent = new Intent(context, JsonFromUrl.class);
-                                    intent.putExtra("arguments", (Serializable) arguments);
-                                    context.startService(intent);
-                                }
-                            }
-                            break;
-                    }
-                }
-            };
             sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
 
             login.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -327,7 +345,17 @@ public class Settings extends AppCompatActivity {
             version.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(@NonNull Preference preference) {
-                    //easter egg
+                    Date now = Calendar.getInstance().getTime();
+                    if (easterEggDate == null || now.getTime() - easterEggDate.getTime() > 5 * 1000) { //5s
+                        easterEggDate = Calendar.getInstance().getTime();
+                        easterEggCounter = 1;
+                    } else if (easterEggCounter == 4) {
+                        easterEggDate = null;
+                        easterEggCounter = 0;
+                        Functions.openUrl(context, "https://github.com/CIAO-Integration");
+                    } else {
+                        easterEggCounter++;
+                    }
                     return false;
                 }
             });
@@ -346,8 +374,7 @@ public class Settings extends AppCompatActivity {
          * Get location from GPS sensor
          */
         public void getLocation() {
-            Boolean connected = Functions.checkConnection(context);
-            if (connected) {
+            if (Functions.checkConnection(context)) {
                 progressDialog = Functions.makeLoadingDialog(context);
                 progressDialog.show();
                 context.registerReceiver(new GpsReceiver(), new IntentFilter(GPS_TARGET));
@@ -355,7 +382,7 @@ public class Settings extends AppCompatActivity {
                 intent.putExtra("target", GPS_TARGET);
                 context.startService(intent);
             } else {
-                Functions.showErrorDialog(context, getString(R.string.error_network));
+                Functions.makeErrorDialog(context, getString(R.string.error_network)).show();
             }
         }
 
@@ -372,28 +399,33 @@ public class Settings extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 context.unregisterReceiver(this);
-                Double latitude = intent.getDoubleExtra("latitude", -1);
-                Double longitude = intent.getDoubleExtra("longitude", -1);
-                Geocoder geocoder = new Geocoder(context);
-                try {
-                    List<Address> list = geocoder.getFromLocation(latitude, longitude, 1);
-                    String admin = list.get(0).getAdminArea() + "," + list.get(0).getCountryName();
-                    editor.putString("location", admin);
-                    editor.apply();
-                    location.setSummary(admin);
+                double latitude = intent.getDoubleExtra("latitude", -1);
+                double longitude = intent.getDoubleExtra("longitude", -1);
+                if (latitude != -1 && longitude != -1) {
+                    Geocoder geocoder = new Geocoder(context);
+                    try {
+                        List<Address> list = geocoder.getFromLocation(latitude, longitude, 1);
+                        String admin = list.get(0).getAdminArea() + "," + list.get(0).getCountryName();
+                        editor.putString("location", admin);
+                        editor.apply();
+                        location.setSummary(admin);
 
-                    Map<String, String> arguments = new HashMap<>();
-                    arguments.put("request", "location");
-                    arguments.put("location", admin);
-                    arguments.put("key", key);
-                    Intent intent1 = new Intent(context, JsonFromUrl.class);
-                    intent1.putExtra("arguments", (Serializable) arguments);
-                    context.startService(intent1);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Functions.showErrorDialog(context, e.toString());
+                        Map<String, String> arguments = new HashMap<>();
+                        arguments.put("request", "location");
+                        arguments.put("location", admin);
+                        arguments.put("key", key);
+                        Intent intent1 = new Intent(context, JsonFromUrl.class);
+                        intent1.putExtra("arguments", (Serializable) arguments);
+                        context.startService(intent1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Functions.makeErrorDialog(context, e.toString()).show();
+                    }
+                    progressDialog.cancel();
+                } else {
+                    progressDialog.cancel();
+                    Functions.makeErrorDialog(context, getString(R.string.error_gps)).show();
                 }
-                progressDialog.cancel();
             }
         }
     }

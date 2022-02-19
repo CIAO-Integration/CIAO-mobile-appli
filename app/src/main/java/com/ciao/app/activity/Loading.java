@@ -56,18 +56,15 @@ public class Loading extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sharedPreferences.edit();
 
-        String theme = sharedPreferences.getString("theme", "light");
-        Functions.setTheme(theme);
+        Functions.setTheme(sharedPreferences.getString("theme", "light"));
 
-        Boolean firstTime = sharedPreferences.getBoolean("firstTime", true);
-        if (firstTime) {
+        if (sharedPreferences.getBoolean("firstTime", true)) {
             startActivity(new Intent(this, Login.class));
             finish();
         } else {
             setContentView(R.layout.activity_loading);
 
-            Boolean connected = Functions.checkConnection(this);
-            if (connected) {
+            if (Functions.checkConnection(this)) {
                 String key = sharedPreferences.getString("key", null);
                 if (key != null) {
                     Map<String, String> arguments = new HashMap<>();
@@ -82,7 +79,7 @@ public class Loading extends AppCompatActivity {
                     Functions.refreshTimeline(this, new TimelineReceiver(), TIMELINE_TARGET);
                 }
             } else {
-                Functions.showErrorDialog(this, getString(R.string.error_network));
+                Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
             }
         }
     }
@@ -110,11 +107,11 @@ public class Loading extends AppCompatActivity {
                         startActivity(new Intent(context, Main.class));
                         finish();
                     } else {
-                        Functions.showErrorDialog(context, getString(R.string.error_message, status, json.getString("message")));
+                        Functions.makeErrorDialog(context, getString(R.string.error_message, status, json.getString("message"))).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Functions.showErrorDialog(context, e.toString());
+                    Functions.makeErrorDialog(context, e.toString()).show();
                 }
             }
         }
@@ -167,12 +164,12 @@ public class Loading extends AppCompatActivity {
                         editor.remove("location_mode");
                         editor.remove("locations");
                     } else {
-                        Functions.showErrorDialog(context, getString(R.string.error_message, status, json.getString("message")));
+                        Functions.makeErrorDialog(context, getString(R.string.error_message, status, json.getString("message"))).show();
                     }
                     editor.apply();
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Functions.showErrorDialog(context, e.toString());
+                    Functions.makeErrorDialog(context, e.toString()).show();
                 }
             }
             Functions.refreshTimeline(context, new TimelineReceiver(), TIMELINE_TARGET);

@@ -258,18 +258,19 @@ public class Functions {
      *
      * @param context Context
      * @param message Message
+     * @return Loading dialog
      */
-    public static void showErrorDialog(Context context, String message) {
+    public static Dialog makeErrorDialog(Context context, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(context.getString(R.string.error));
         builder.setMessage(message);
         builder.setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+                dialog.cancel();
             }
         });
-        builder.show();
+        return builder.create();
     }
 
     /**

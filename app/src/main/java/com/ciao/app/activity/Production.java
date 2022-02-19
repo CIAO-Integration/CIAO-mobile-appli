@@ -65,6 +65,13 @@ public class Production extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_production);
 
+        String id = getIntent().getStringExtra("id");
+        if (id.startsWith("art")) {
+            type = "article";
+        } else if (id.startsWith("vid")) {
+            type = "video";
+        }
+
         ImageView back = findViewById(R.id.actionbar_logo);
         back.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.back));
         back.setOnClickListener(new View.OnClickListener() {
@@ -98,16 +105,7 @@ public class Production extends AppCompatActivity {
         CardView cardView = findViewById(R.id.actionbar_cardview);
         cardView.setElevation(0);
 
-
-        String id = getIntent().getStringExtra("id");
-        if (id.startsWith("art")) {
-            type = "article";
-        } else if (id.startsWith("vid")) {
-            type = "video";
-        }
-
-        Boolean connected = Functions.checkConnection(this);
-        if (connected) {
+        if (Functions.checkConnection(this)) {
             registerReceiver(new ProductionReceiver(), new IntentFilter(TARGET));
             Map<String, String> arguments = new HashMap<>();
             arguments.put("request", "production");
@@ -119,7 +117,7 @@ public class Production extends AppCompatActivity {
             progressDialog = Functions.makeLoadingDialog(this);
             progressDialog.show();
         } else {
-            Functions.showErrorDialog(this, getString(R.string.error_network));
+            Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
         }
     }
 
@@ -171,7 +169,7 @@ public class Production extends AppCompatActivity {
                                     @Override
                                     public boolean onError(MediaPlayer mp, int what, int extra) {
                                         progressDialog.cancel();
-                                        Functions.showErrorDialog(context, getString(R.string.error_video));
+                                        Functions.makeErrorDialog(context, getString(R.string.error_video)).show();
                                         return true;
                                     }
                                 });
@@ -189,12 +187,12 @@ public class Production extends AppCompatActivity {
                         }
                     } else {
                         progressDialog.cancel();
-                        Functions.showErrorDialog(context, getString(R.string.error_message, status, json.getString("message")));
+                        Functions.makeErrorDialog(context, getString(R.string.error_message, status, json.getString("message"))).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                     progressDialog.cancel();
-                    Functions.showErrorDialog(context, e.toString());
+                    Functions.makeErrorDialog(context, e.toString()).show();
                 }
             }
         }
@@ -216,7 +214,7 @@ public class Production extends AppCompatActivity {
             String text = intent.getStringExtra("text");
             if (text == null) {
                 progressDialog.cancel();
-                Functions.showErrorDialog(context, getString(R.string.error_article));
+                Functions.makeErrorDialog(context, getString(R.string.error_article)).show();
             } else {
                 ArticleBuilder articleBuilder = new ArticleBuilder(context, findViewById(R.id.article_content), text);
                 articleBuilder.build();

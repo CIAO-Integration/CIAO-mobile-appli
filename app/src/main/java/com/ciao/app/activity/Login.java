@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -26,6 +29,8 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Activity showing login/register screen
@@ -36,6 +41,14 @@ public class Login extends AppCompatActivity {
      */
     private final String TARGET = "Login";
     /**
+     * Email pattern
+     */
+    private final Pattern emailPattern = Pattern.compile("^[A-Za-z0-9.]+@[A-Za-z]+[.][a-z]{2,3}$");
+    /**
+     * Password pattern
+     */
+    private final Pattern passwordPattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!*@#$&]).{8,}$");
+    /**
      * Shared preferences
      */
     private SharedPreferences sharedPreferences;
@@ -43,6 +56,54 @@ public class Login extends AppCompatActivity {
      * Shared preferences editor
      */
     private SharedPreferences.Editor editor;
+    /**
+     * Username valid
+     */
+    private Boolean registerUsernameValid = false;
+    /**
+     * Email valid
+     */
+    private Boolean registerEmailValid = false;
+    /**
+     * Password valid
+     */
+    private Boolean registerPasswordValid = false;
+    /**
+     * Confirmation password valid
+     */
+    private Boolean registerConfPasswordValid = false;
+    /**
+     * Login email
+     */
+    private EditText loginEmail;
+    /**
+     * Login password
+     */
+    private EditText loginPassword;
+    /**
+     * Register username
+     */
+    private EditText registerUsername;
+    /**
+     * Register email
+     */
+    private EditText registerEmail;
+    /**
+     * Register password
+     */
+    private EditText registerPassword;
+    /**
+     * Register confirmation password
+     */
+    private EditText registerConfPassword;
+    /**
+     * Login
+     */
+    private LinearLayout login;
+    /**
+     * Register
+     */
+    private LinearLayout register;
 
     /**
      * Create Activity
@@ -56,6 +117,101 @@ public class Login extends AppCompatActivity {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sharedPreferences.edit();
+
+        loginEmail = findViewById(R.id.login_login_email);
+        loginPassword = findViewById(R.id.login_login_password);
+        registerUsername = findViewById(R.id.login_register_username);
+        registerEmail = findViewById(R.id.login_register_email);
+        registerPassword = findViewById(R.id.login_register_password);
+        registerConfPassword = findViewById(R.id.login_register_confirm_password);
+        login = findViewById(R.id.login_login);
+        register = findViewById(R.id.login_register);
+
+        registerUsername.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().length() > 0) {
+                    registerUsername.setBackgroundColor(Color.WHITE);
+                    registerUsernameValid = true;
+                } else {
+                    registerUsername.setBackgroundColor(Color.RED);
+                    registerUsernameValid = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        registerEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Matcher matcher = emailPattern.matcher(s.toString());
+                if (matcher.matches()) {
+                    registerEmail.setBackgroundColor(Color.WHITE);
+                    registerEmailValid = true;
+                } else {
+                    registerEmail.setBackgroundColor(Color.RED);
+                    registerEmailValid = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        registerPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Matcher matcher = passwordPattern.matcher(s.toString());
+                if (matcher.matches()) {
+                    registerPassword.setBackgroundColor(Color.WHITE);
+                    registerPasswordValid = true;
+                } else {
+                    registerPassword.setBackgroundColor(Color.RED);
+                    registerPasswordValid = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        registerConfPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (registerPassword.getText().toString().equals(s.toString())) {
+                    registerConfPassword.setBackgroundColor(Color.WHITE);
+                    registerConfPasswordValid = true;
+                } else {
+                    registerConfPassword.setBackgroundColor(Color.RED);
+                    registerConfPasswordValid = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
     }
 
     /**
@@ -64,22 +220,21 @@ public class Login extends AppCompatActivity {
      * @param view View
      */
     public void login(View view) {
-        Boolean connected = Functions.checkConnection(this);
-        if (connected) {
-            EditText email = findViewById(R.id.login_login_email);
-            EditText password = findViewById(R.id.login_login_password);
-            Log.d("email", email.getText().toString());
+        if (Functions.checkConnection(this)) {
+            String email = loginEmail.getText().toString();
+            String password = loginPassword.getText().toString();
+            Log.d("email", email);
             Map<String, String> arguments = new HashMap<>();
             arguments.put("request", "login");
-            arguments.put("email", email.getText().toString());
-            arguments.put("password", password.getText().toString());
+            arguments.put("email", email);
+            arguments.put("password", password);
             registerReceiver(new LoginReceiver(), new IntentFilter(TARGET));
             Intent intent = new Intent(this, JsonFromUrl.class);
             intent.putExtra("arguments", (Serializable) arguments);
             intent.putExtra("target", TARGET);
             startService(intent);
         } else {
-            Functions.showErrorDialog(this, getString(R.string.error_network));
+            Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
         }
     }
 
@@ -89,27 +244,36 @@ public class Login extends AppCompatActivity {
      * @param view View
      */
     public void register(View view) {
-        Boolean connected = Functions.checkConnection(this);
-        if (connected) {
-            EditText username = findViewById(R.id.login_register_username);
-            EditText email = findViewById(R.id.login_register_email);
-            EditText password = findViewById(R.id.login_register_password);
-            EditText confirmPassword = findViewById(R.id.login_register_confirm_password);
-            Log.d("username", username.getText().toString());
-            Log.d("email", email.getText().toString());
-            Map<String, String> arguments = new HashMap<>();
-            arguments.put("request", "register");
-            arguments.put("username", username.getText().toString());
-            arguments.put("email", email.getText().toString());
-            arguments.put("password", password.getText().toString());
-            arguments.put("conf_password", confirmPassword.getText().toString());
-            registerReceiver(new RegisterReceiver(), new IntentFilter(TARGET));
-            Intent intent = new Intent(this, JsonFromUrl.class);
-            intent.putExtra("arguments", (Serializable) arguments);
-            intent.putExtra("target", TARGET);
-            startService(intent);
+        if (Functions.checkConnection(this)) {
+            if (!registerUsernameValid) {
+                Functions.makeErrorDialog(this, getString(R.string.not_valid_username)).show();
+            } else if (!registerEmailValid) {
+                Functions.makeErrorDialog(this, getString(R.string.not_valid_email)).show();
+            } else if (!registerPasswordValid) {
+                Functions.makeErrorDialog(this, getString(R.string.not_valid_password)).show();
+            } else if (!registerConfPasswordValid) {
+                Functions.makeErrorDialog(this, getString(R.string.not_valid_conf_password)).show();
+            } else {
+                String username = registerUsername.getText().toString();
+                String email = registerEmail.getText().toString();
+                String password = registerPassword.getText().toString();
+                String confPassword = registerConfPassword.getText().toString();
+                Log.d("username", username);
+                Log.d("email", email);
+                Map<String, String> arguments = new HashMap<>();
+                arguments.put("request", "register");
+                arguments.put("username", username);
+                arguments.put("email", email);
+                arguments.put("password", password);
+                arguments.put("conf_password", confPassword);
+                registerReceiver(new RegisterReceiver(), new IntentFilter(TARGET));
+                Intent intent = new Intent(this, JsonFromUrl.class);
+                intent.putExtra("arguments", (Serializable) arguments);
+                intent.putExtra("target", TARGET);
+                startService(intent);
+            }
         } else {
-            Functions.showErrorDialog(this, getString(R.string.error_network));
+            Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
         }
     }
 
@@ -119,8 +283,6 @@ public class Login extends AppCompatActivity {
      * @param view View
      */
     public void no_account(View view) {
-        LinearLayout login = findViewById(R.id.login_login);
-        LinearLayout register = findViewById(R.id.login_register);
         login.setVisibility(View.GONE);
         register.setVisibility(View.VISIBLE);
     }
@@ -131,8 +293,6 @@ public class Login extends AppCompatActivity {
      * @param view View
      */
     public void have_account(View view) {
-        LinearLayout login = findViewById(R.id.login_login);
-        LinearLayout register = findViewById(R.id.login_register);
         login.setVisibility(View.VISIBLE);
         register.setVisibility(View.GONE);
     }
@@ -185,11 +345,11 @@ public class Login extends AppCompatActivity {
                     } else if (status.equals("404")) {
                         Snackbar.make(findViewById(android.R.id.content), getString(R.string.user_not_found), Snackbar.LENGTH_SHORT).show();
                     } else {
-                        Functions.showErrorDialog(context, getString(R.string.error_message, status, json.getString("message")));
+                        Functions.makeErrorDialog(context, getString(R.string.error_message, status, json.getString("message"))).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Functions.showErrorDialog(context, e.toString());
+                    Functions.makeErrorDialog(context, e.toString()).show();
                 }
             }
         }
@@ -221,11 +381,11 @@ public class Login extends AppCompatActivity {
                     } else if (status.equals("401")) {
                         Snackbar.make(findViewById(android.R.id.content), getString(R.string.user_exists), Snackbar.LENGTH_SHORT).show();
                     } else {
-                        Functions.showErrorDialog(context, getString(R.string.error_message, status, json.getString("message")));
+                        Functions.makeErrorDialog(context, getString(R.string.error_message, status, json.getString("message"))).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Functions.showErrorDialog(context, e.toString());
+                    Functions.makeErrorDialog(context, e.toString()).show();
                 }
             }
         }

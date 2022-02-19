@@ -40,11 +40,11 @@
     <string name="login_register">Connexion ou inscription</string>
     <string name="login_register_summary">Plus on est, plus on rigole !</string>
     <string name="logout">Déconnexion</string>
-    <string name="logout_summary">Pourquoi :(</string>
+    <string name="logout_summary">À plus !</string>
     <string name="set_location">Définir localisation</string>
     <string name="undefined">Non défini</string>
     <string name="server_error">Erreur serveur</string>
-    <string name="check_email">Veuillez vérifier votre boîte mail pour valider votre compte</string>
+    <string name="check_email">Succès ! Veuillez vérifier votre boîte mail pour valider votre compte</string>
     <string name="wrong_password">Mot de passe erroné</string>
     <string name="user_not_found">Utilisateur introuvable</string>
     <string name="user_exists">Utilisateur existe déjà</string>
@@ -66,4 +66,9 @@
     <string name="error_video">Erreur lors du chargement de la vidéo</string>
     <string name="error_article">Erreur lors du chargement de l\'article</string>
     <string name="error_network">Veuillez vérifier votre connexion à internet</string>
+    <string name="not_valid_username">Le pseudo ne peut être vide</string>
+    <string name="not_valid_email">L\'email doit être de la forme chose@domain.fr</string>
+    <string name="not_valid_conf_password">Le mot de passe de confirmation doit être identique au mot de passe</string>
+    <string name="not_valid_password">Le mot de passe doit contenir au moins 8 charactères et contenir au moins 1 lettre majuscule, 1 lettre minuscule, 1 chiffre et 1 charactère spécial (!*@#$&amp;)</string>
+    <string name="error_gps">Obtention de votre localisation échouée</string>
 </resources>

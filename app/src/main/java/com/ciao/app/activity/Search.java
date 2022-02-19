@@ -52,6 +52,7 @@ public class Search extends AppCompatActivity {
                 finish();
             }
         });
+
         switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
             case Configuration.UI_MODE_NIGHT_YES:
                 back.setColorFilter(Color.LTGRAY);
