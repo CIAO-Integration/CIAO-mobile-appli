@@ -82,7 +82,7 @@ public class Functions {
                 filter = "sport";
                 break;
         }
-        ArrayList<HashMap<String, String>> data = database.getRows(filter, location);
+        ArrayList<HashMap<String, String>> data = database.getRowsByFilter(filter, location);
         database.close();
         Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(context, data);
         recyclerView.setAdapter(recyclerViewAdapter);

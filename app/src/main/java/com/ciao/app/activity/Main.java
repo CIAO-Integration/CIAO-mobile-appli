@@ -190,6 +190,9 @@ public class Main extends AppCompatActivity {
     public void search(View view) {
         EditText editText = findViewById(R.id.main_searchBar);
         String text = editText.getText().toString();
+        Intent intent = new Intent(this, Search.class);
+        intent.putExtra("search", text);
+        startActivity(intent);
     }
 
     /**
@@ -357,7 +360,7 @@ public class Main extends AppCompatActivity {
                         JSONArray array = json.getJSONArray("list");
                         Functions.storeTimeline(context, array);
                         Database database = new Database(context);
-                        Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(context, database.getRows(filter, location));
+                        Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(context, database.getRowsByFilter(filter, location));
                         database.close();
                         recyclerView.setAdapter(recyclerViewAdapter);
                     } else {

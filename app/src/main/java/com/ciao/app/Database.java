@@ -87,18 +87,67 @@ public class Database extends SQLiteOpenHelper {
 
     /**
      * Get rows of database
+     * @return Rows
+     */
+    public ArrayList<HashMap<String, String>> getRows() {
+        String query = "SELECT * FROM " + TABLE_NAME;
+        ArrayList<HashMap<String, String>> rows = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            HashMap<String, String> row = new HashMap<>();
+            row.put("id", cursor.getString(0));
+            row.put("thumbnail", cursor.getString(1));
+            row.put("title", cursor.getString(2));
+            row.put("tags", cursor.getString(3));
+            row.put("date", cursor.getString(4));
+            row.put("location", cursor.getString(5));
+            rows.add(row);
+        }
+        cursor.close();
+        db.close();
+        return rows;
+    }
+
+    /**
+     * Get rows of database by filter
      *
      * @param filter   Filter
      * @param location Location
      * @return Rows
      */
-    public ArrayList<HashMap<String, String>> getRows(String filter, String location) {
+    public ArrayList<HashMap<String, String>> getRowsByFilter(String filter, String location) {
         String query = "SELECT * FROM " + TABLE_NAME;
         if (location != null) {
             query = "SELECT * FROM " + TABLE_NAME + " WHERE location LIKE '%" + location + "%'";
         } else if (filter != null) {
             query = "SELECT * FROM " + TABLE_NAME + " WHERE tags LIKE '%" + filter + "%'";
         }
+        ArrayList<HashMap<String, String>> rows = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            HashMap<String, String> row = new HashMap<>();
+            row.put("id", cursor.getString(0));
+            row.put("thumbnail", cursor.getString(1));
+            row.put("title", cursor.getString(2));
+            row.put("tags", cursor.getString(3));
+            row.put("date", cursor.getString(4));
+            row.put("location", cursor.getString(5));
+            rows.add(row);
+        }
+        cursor.close();
+        db.close();
+        return rows;
+    }
+
+    /**
+     * Get rows of database by title
+     * @param search Search
+     * @return Rows
+     */
+    public ArrayList<HashMap<String, String>> getRowsBySearch(String search) {
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE title LIKE '%" + search + "%' OR tags LIKE '%" + search + "%' OR id LIKE '%" + search + "%' OR date LIKE '%" + search + "%' OR location LIKE '%" + search + "%'";
         ArrayList<HashMap<String, String>> rows = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);

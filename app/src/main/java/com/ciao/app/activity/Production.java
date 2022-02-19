@@ -56,14 +56,14 @@ public class Production extends AppCompatActivity {
         setContentView(R.layout.activity_production);
 
         findViewById(R.id.actionbar_avatar).setVisibility(View.GONE);
-        findViewById(R.id.actionbar_logo).setOnClickListener(new View.OnClickListener() {
+        ImageView back = findViewById(R.id.actionbar_logo);
+        back.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.back));
+        back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
-        ImageView back = findViewById(R.id.actionbar_logo);
-        back.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.back));
         switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
             case Configuration.UI_MODE_NIGHT_YES:
                 back.setColorFilter(Color.LTGRAY);

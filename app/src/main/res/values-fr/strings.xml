@@ -58,4 +58,5 @@
     <string name="error_message">Status : %1$s\nMessage : %2$s</string>
     <string name="loading">Chargement</string>
     <string name="loading_message">Veuillez patienter...</string>
+    <string name="search_results">Résultats pour \"%1$s\"</string>
 </resources>
