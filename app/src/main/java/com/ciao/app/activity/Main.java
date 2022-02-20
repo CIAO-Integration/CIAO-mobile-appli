@@ -260,10 +260,10 @@ public class Main extends AppCompatActivity {
                 Drawable placeholder = AppCompatResources.getDrawable(context, R.drawable.no_image);
                 Glide.with(context).load(source).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.image);
             }
-            String id = data.get(position).get("id");
-            if (id.startsWith("vid")) {
+            if (data.get(position).get("type").equals("video")) {
                 holder.image.setForeground(AppCompatResources.getDrawable(context, android.R.drawable.ic_media_play));
             }
+            String id = data.get(position).get("id");
             holder.card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

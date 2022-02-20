@@ -72,6 +72,10 @@ public class Production extends AppCompatActivity {
      * Content
      */
     private LinearLayout content;
+    /**
+     * Video view status
+     */
+    private Boolean prepared = false;
 
     /**
      * Create Activity
@@ -133,9 +137,10 @@ public class Production extends AppCompatActivity {
         TextView productionTitle = findViewById(R.id.production_title);
         productionTitle.setText(row.get("title"));
         String path = row.get("path");
+        boolean pathIsValid = path != null && !path.equals("null") && !path.equals("");
         if (type.equals("article")) {
             actionBarTitle.setText(getString(R.string.article));
-            if (!path.equals("null")) {
+            if (pathIsValid) {
                 registerReceiver(new ArticleReceiver(), new IntentFilter(TARGET));
                 Intent intent1 = new Intent(this, TextFromUrl.class);
                 intent1.putExtra("path", BuildConfig.STORAGE_SERVER_URL + path);
@@ -145,22 +150,14 @@ public class Production extends AppCompatActivity {
         } else if (type.equals("video")) {
             actionBarTitle.setText(getString(R.string.video));
             videoView.setVisibility(View.VISIBLE);
-            if (!path.equals("null")) {
+            if (pathIsValid) {
                 if (!path.startsWith("http")) {
                     path = BuildConfig.STORAGE_SERVER_URL + path;
                 }
-                videoView.setVideoPath(path);
-                videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                    @Override
-                    public boolean onError(MediaPlayer mp, int what, int extra) {
-                        progressDialog.cancel();
-                        Functions.makeErrorDialog(Production.this, getString(R.string.error_video)).show();
-                        return true;
-                    }
-                });
                 videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mediaPlayer) {
+                        prepared = true;
                         MediaController mediaController = new MediaController(Production.this);
                         videoView.setMediaController(mediaController);
                         mediaController.setAnchorView(videoView);
@@ -168,6 +165,17 @@ public class Production extends AppCompatActivity {
                         videoView.start();
                     }
                 });
+                videoView.setVideoPath(path);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!prepared) {
+                            progressDialog.cancel();
+                            videoView.suspend();
+                            Functions.makeErrorDialog(Production.this, getString(R.string.error_video)).show();
+                        }
+                    }
+                }, 5000);
             }
             ArticleBuilder articleBuilder = new ArticleBuilder(Production.this, content, "<p>" + row.get("description") + "</p>");
             articleBuilder.build();
