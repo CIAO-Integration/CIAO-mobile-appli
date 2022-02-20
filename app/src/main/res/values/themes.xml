@@ -29,6 +29,7 @@
 
     <style name="Theme.CIAO.CardView" parent="CardView">
         <item name="cardBackgroundColor">@color/blue_light</item>
+        <item name="cardCornerRadius">@dimen/corner_radius</item>
     </style>
 
     <style name="Theme.CIAO.NavigationView" parent="Widget.MaterialComponents.NavigationRailView">

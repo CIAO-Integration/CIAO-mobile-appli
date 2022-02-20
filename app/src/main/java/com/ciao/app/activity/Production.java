@@ -76,6 +76,10 @@ public class Production extends AppCompatActivity {
      * Video view status
      */
     private Boolean prepared = false;
+    /**
+     * Tags
+     */
+    private String tags;
 
     /**
      * Create Activity
@@ -133,6 +137,7 @@ public class Production extends AppCompatActivity {
 
         type = row.get("type");
         link = row.get("link");
+        tags = row.get("tags");
         TextView actionBarTitle = findViewById(R.id.actionbar_title);
         TextView productionTitle = findViewById(R.id.production_title);
         productionTitle.setText(row.get("title"));
@@ -146,6 +151,9 @@ public class Production extends AppCompatActivity {
                 intent1.putExtra("path", BuildConfig.STORAGE_SERVER_URL + path);
                 intent1.putExtra("target", TARGET);
                 startService(intent1);
+            } else {
+                progressDialog.cancel();
+                Functions.makeErrorDialog(this, getString(R.string.error_article)).show();
             }
         } else if (type.equals("video")) {
             actionBarTitle.setText(getString(R.string.video));
@@ -176,8 +184,11 @@ public class Production extends AppCompatActivity {
                         }
                     }
                 }, 5000);
+            } else {
+                progressDialog.cancel();
+                Functions.makeErrorDialog(Production.this, getString(R.string.error_video)).show();
             }
-            ArticleBuilder articleBuilder = new ArticleBuilder(Production.this, content, "<p>" + row.get("description") + "</p>");
+            ArticleBuilder articleBuilder = new ArticleBuilder(Production.this, content, "<p>" + row.get("description") + "</p>", tags);
             articleBuilder.build();
         }
 
@@ -263,7 +274,7 @@ public class Production extends AppCompatActivity {
                 progressDialog.cancel();
                 Functions.makeErrorDialog(context, getString(R.string.error_article)).show();
             } else {
-                ArticleBuilder articleBuilder = new ArticleBuilder(context, content, text);
+                ArticleBuilder articleBuilder = new ArticleBuilder(context, content, text, tags);
                 articleBuilder.build();
                 progressDialog.cancel();
             }

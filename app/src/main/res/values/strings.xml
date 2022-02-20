@@ -71,4 +71,5 @@
     <string name="not_valid_password">Password must be at least 8 characters and contains at least 1 lower-case letter, 1 upper-case letter, 1 number and 1 special character (!*@#$&amp;)</string>
     <string name="not_valid_conf_password">Confirmation password must match password</string>
     <string name="error_gps">Failed retrieving your location</string>
+    <string name="tags">Tags :</string>
 </resources>
