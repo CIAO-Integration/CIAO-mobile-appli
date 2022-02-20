@@ -1,5 +1,6 @@
 package com.ciao.app.activity;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -31,17 +33,12 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.ciao.app.ArticleBuilder;
 import com.ciao.app.BuildConfig;
+import com.ciao.app.Database;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
-import com.ciao.app.service.JsonFromUrl;
 import com.ciao.app.service.TextFromUrl;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Activity showing an article
@@ -70,11 +67,11 @@ public class Production extends AppCompatActivity {
     /**
      * Production
      */
-    private LinearLayout production;
+    private LinearLayout fullscreen;
     /**
-     * Video
+     * Content
      */
-    private LinearLayout video;
+    private LinearLayout content;
 
     /**
      * Create Activity
@@ -86,16 +83,9 @@ public class Production extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_production);
 
-        videoView = findViewById(R.id.video_content);
-        production = findViewById(R.id.production);
-        video = findViewById(R.id.video);
-
-        String id = getIntent().getStringExtra("id");
-        if (id.startsWith("art")) {
-            type = "article";
-        } else if (id.startsWith("vid")) {
-            type = "video";
-        }
+        videoView = findViewById(R.id.production_video);
+        fullscreen = findViewById(R.id.production_fullscreen);
+        content = findViewById(R.id.production_content);
 
         ImageView back = findViewById(R.id.actionbar_logo);
         back.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.back));
@@ -130,27 +120,66 @@ public class Production extends AppCompatActivity {
         CardView cardView = findViewById(R.id.actionbar_cardview);
         cardView.setElevation(0);
 
-        if (Functions.checkConnection(this)) {
-            registerReceiver(new ProductionReceiver(), new IntentFilter(TARGET));
-            Map<String, String> arguments = new HashMap<>();
-            arguments.put("request", "production");
-            arguments.put("id", id);
-            Intent intent = new Intent(this, JsonFromUrl.class);
-            intent.putExtra("arguments", (Serializable) arguments);
-            intent.putExtra("target", TARGET);
-            startService(intent);
-            progressDialog = Functions.makeLoadingDialog(this);
-            progressDialog.show();
-        } else {
-            Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
+        progressDialog = Functions.makeLoadingDialog(this);
+        progressDialog.show();
+
+        Database database = new Database(this);
+        HashMap<String, String> row = database.getRowById(getIntent().getStringExtra("id"));
+        database.close();
+
+        type = row.get("type");
+        link = row.get("link");
+        TextView actionBarTitle = findViewById(R.id.actionbar_title);
+        TextView productionTitle = findViewById(R.id.production_title);
+        productionTitle.setText(row.get("title"));
+        String path = row.get("path");
+        if (type.equals("article")) {
+            actionBarTitle.setText(getString(R.string.article));
+            if (!path.equals("null")) {
+                registerReceiver(new ArticleReceiver(), new IntentFilter(TARGET));
+                Intent intent1 = new Intent(this, TextFromUrl.class);
+                intent1.putExtra("path", BuildConfig.STORAGE_SERVER_URL + path);
+                intent1.putExtra("target", TARGET);
+                startService(intent1);
+            }
+        } else if (type.equals("video")) {
+            actionBarTitle.setText(getString(R.string.video));
+            videoView.setVisibility(View.VISIBLE);
+            if (!path.equals("null")) {
+                if (!path.startsWith("http")) {
+                    path = BuildConfig.STORAGE_SERVER_URL + path;
+                }
+                videoView.setVideoPath(path);
+                videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                    @Override
+                    public boolean onError(MediaPlayer mp, int what, int extra) {
+                        progressDialog.cancel();
+                        Functions.makeErrorDialog(Production.this, getString(R.string.error_video)).show();
+                        return true;
+                    }
+                });
+                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mediaPlayer) {
+                        MediaController mediaController = new MediaController(Production.this);
+                        videoView.setMediaController(mediaController);
+                        mediaController.setAnchorView(videoView);
+                        progressDialog.cancel();
+                        videoView.start();
+                    }
+                });
+            }
+            ArticleBuilder articleBuilder = new ArticleBuilder(Production.this, content, "<p>" + row.get("description") + "</p>");
+            articleBuilder.build();
         }
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && type.equals("video")) {
             WindowInsetsControllerCompat windowInsetsController = ViewCompat.getWindowInsetsController(getWindow().getDecorView());
             windowInsetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
-            video.removeView(videoView);
-            production.addView(videoView, 0);
+            fullscreen.setVisibility(View.VISIBLE);
+            content.removeView(videoView);
+            fullscreen.addView(videoView, 0);
         }
     }
 
@@ -170,12 +199,14 @@ public class Production extends AppCompatActivity {
                 windowInsetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
-                    video.removeView(videoView);
-                    production.addView(videoView, 0);
+                    fullscreen.setVisibility(View.VISIBLE);
+                    content.removeView(videoView);
+                    fullscreen.addView(videoView, 0);
                 } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
                     windowInsetsController.show(WindowInsetsCompat.Type.systemBars());
-                    production.removeView(videoView);
-                    video.addView(videoView, video.getChildCount());
+                    fullscreen.removeView(videoView);
+                    content.addView(videoView, content.getChildCount() - 1);
+                    fullscreen.setVisibility(View.GONE);
                 }
                 videoView.seekTo(position);
             }
@@ -207,85 +238,9 @@ public class Production extends AppCompatActivity {
     }
 
     /**
-     * Broadcast receiver for JsonFromUrl
-     */
-    private class ProductionReceiver extends BroadcastReceiver {
-        /**
-         * On receive
-         *
-         * @param context Context
-         * @param intent  Intent
-         */
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            unregisterReceiver(this);
-            if (intent.getStringExtra("json") != null) {
-                try {
-                    JSONObject json = new JSONObject(intent.getStringExtra("json"));
-                    String status = json.getString("status");
-                    if (status.equals("200")) {
-                        String path = json.getString("path");
-                        String title = json.getString("title");
-                        link = json.getString("link");
-
-                        TextView actionBarTitle = findViewById(R.id.actionbar_title);
-                        if (type.equals("article")) {
-                            actionBarTitle.setText(getString(R.string.article));
-                            if (!path.equals("null")) {
-                                registerReceiver(new TextReceiver(), new IntentFilter(TARGET));
-                                Intent intent1 = new Intent(context, TextFromUrl.class);
-                                intent1.putExtra("path", BuildConfig.STORAGE_SERVER_URL + path);
-                                intent1.putExtra("target", TARGET);
-                                startService(intent1);
-                            }
-                        } else if (type.equals("video")) {
-                            actionBarTitle.setText(getString(R.string.video));
-                            TextView videoTitle = findViewById(R.id.video_title);
-                            videoTitle.setText(title);
-                            if (!path.equals("null")) {
-                                findViewById(R.id.article).setVisibility(View.GONE);
-                                video.setVisibility(View.VISIBLE);
-                                if (!path.startsWith("http")) {
-                                    path = BuildConfig.STORAGE_SERVER_URL + path;
-                                }
-                                videoView.setVideoPath(path);
-                                videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                                    @Override
-                                    public boolean onError(MediaPlayer mp, int what, int extra) {
-                                        progressDialog.cancel();
-                                        Functions.makeErrorDialog(context, getString(R.string.error_video)).show();
-                                        return true;
-                                    }
-                                });
-                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                    @Override
-                                    public void onPrepared(MediaPlayer mediaPlayer) {
-                                        Production.MediaController mediaController = new Production.MediaController(context);
-                                        videoView.setMediaController(mediaController);
-                                        mediaController.setAnchorView(videoView);
-                                        progressDialog.cancel();
-                                        videoView.start();
-                                    }
-                                });
-                            }
-                        }
-                    } else {
-                        progressDialog.cancel();
-                        Functions.makeErrorDialog(context, getString(R.string.error_message, status, json.getString("message"))).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    progressDialog.cancel();
-                    Functions.makeErrorDialog(context, e.toString()).show();
-                }
-            }
-        }
-    }
-
-    /**
      * Broadcast receiver for TextFromUrl
      */
-    private class TextReceiver extends BroadcastReceiver {
+    private class ArticleReceiver extends BroadcastReceiver {
         /**
          * On receive
          *
@@ -300,7 +255,7 @@ public class Production extends AppCompatActivity {
                 progressDialog.cancel();
                 Functions.makeErrorDialog(context, getString(R.string.error_article)).show();
             } else {
-                ArticleBuilder articleBuilder = new ArticleBuilder(context, findViewById(R.id.article_content), text);
+                ArticleBuilder articleBuilder = new ArticleBuilder(context, content, text);
                 articleBuilder.build();
                 progressDialog.cancel();
             }
@@ -335,7 +290,7 @@ public class Production extends AppCompatActivity {
         public void setAnchorView(View view) {
             super.setAnchorView(view);
             Button button = new Button(context, null, R.attr.borderlessButtonStyle);
-            button.setForeground(AppCompatResources.getDrawable(context, android.R.drawable.ic_menu_always_landscape_portrait));
+            button.setForeground(AppCompatResources.getDrawable(context, R.drawable.fullscreen));
             button.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -343,8 +298,22 @@ public class Production extends AppCompatActivity {
                 }
             });
             FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            layoutParams.gravity = Gravity.END | Gravity.TOP;
+            layoutParams.gravity = Gravity.END;
             addView(button, layoutParams);
+        }
+
+        /**
+         * Finish on back pressed
+         *
+         * @param event Event
+         * @return dispatchKeyEvent
+         */
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent event) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+                ((Activity) context).finish();
+            }
+            return super.dispatchKeyEvent(event);
         }
     }
 }

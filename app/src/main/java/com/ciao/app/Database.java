@@ -37,7 +37,7 @@ public class Database extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(id TEXT, thumbnail TEXT, title TEXT, tags TEXT, date TEXT, location TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(id TEXT, thumbnail TEXT, title TEXT, tags TEXT, date TEXT, location TEXT, type TEXT, path TEXT, link TEXT, description TEXT)");
         Log.d("database", "created table");
     }
 
@@ -69,6 +69,10 @@ public class Database extends SQLiteOpenHelper {
             contentValues.put("tags", row.get("tags"));
             contentValues.put("date", row.get("date"));
             contentValues.put("location", row.get("location"));
+            contentValues.put("type", row.get("type"));
+            contentValues.put("path", row.get("path"));
+            contentValues.put("link", row.get("link"));
+            contentValues.put("description", row.get("description"));
             db.insert(TABLE_NAME, null, contentValues);
         }
         db.close();
@@ -103,6 +107,10 @@ public class Database extends SQLiteOpenHelper {
             row.put("tags", cursor.getString(3));
             row.put("date", cursor.getString(4));
             row.put("location", cursor.getString(5));
+            row.put("type", cursor.getString(6));
+            row.put("path", cursor.getString(7));
+            row.put("link", cursor.getString(8));
+            row.put("description", cursor.getString(9));
             rows.add(row);
         }
         cursor.close();
@@ -135,6 +143,10 @@ public class Database extends SQLiteOpenHelper {
             row.put("tags", cursor.getString(3));
             row.put("date", cursor.getString(4));
             row.put("location", cursor.getString(5));
+            row.put("type", cursor.getString(6));
+            row.put("path", cursor.getString(7));
+            row.put("link", cursor.getString(8));
+            row.put("description", cursor.getString(9));
             rows.add(row);
         }
         cursor.close();
@@ -161,6 +173,10 @@ public class Database extends SQLiteOpenHelper {
             row.put("tags", cursor.getString(3));
             row.put("date", cursor.getString(4));
             row.put("location", cursor.getString(5));
+            row.put("type", cursor.getString(6));
+            row.put("path", cursor.getString(7));
+            row.put("link", cursor.getString(8));
+            row.put("description", cursor.getString(9));
             rows.add(row);
         }
         cursor.close();
@@ -183,10 +199,41 @@ public class Database extends SQLiteOpenHelper {
                     cursor.getString(2) + " | " +
                     cursor.getString(3) + " | " +
                     cursor.getString(4) + " | " +
-                    cursor.getString(5) + "\n";
+                    cursor.getString(5) + " | " +
+                    cursor.getString(6) + " | " +
+                    cursor.getString(7) + " | " +
+                    cursor.getString(8) + " | " +
+                    cursor.getString(9) + "\n";
         }
         cursor.close();
         db.close();
         return string;
+    }
+
+    /**
+     * Get row by id
+     *
+     * @param id Id
+     * @return Row
+     */
+    public HashMap<String, String> getRowById(String id) {
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE id='" + id + "'";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        cursor.moveToNext();
+        HashMap<String, String> row = new HashMap<>();
+        row.put("id", cursor.getString(0));
+        row.put("thumbnail", cursor.getString(1));
+        row.put("title", cursor.getString(2));
+        row.put("tags", cursor.getString(3));
+        row.put("date", cursor.getString(4));
+        row.put("location", cursor.getString(5));
+        row.put("type", cursor.getString(6));
+        row.put("path", cursor.getString(7));
+        row.put("link", cursor.getString(8));
+        row.put("description", cursor.getString(9));
+        cursor.close();
+        db.close();
+        return row;
     }
 }

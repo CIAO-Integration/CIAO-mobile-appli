@@ -214,6 +214,10 @@ public class Functions {
             row.put("tags", item.getString("tags"));
             row.put("date", item.getString("date"));
             row.put("location", item.getString("location"));
+            row.put("type", item.getString("type"));
+            row.put("path", item.getString("path"));
+            row.put("link", item.getString("link"));
+            row.put("description", item.getString("description"));
             rows.add(row);
         }
         Database database = new Database(context);
