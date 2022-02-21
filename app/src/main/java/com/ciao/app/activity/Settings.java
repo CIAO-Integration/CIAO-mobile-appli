@@ -378,7 +378,7 @@ public class Settings extends AppCompatActivity {
                 progressDialog = Functions.makeLoadingDialog(context);
                 progressDialog.show();
                 gpsReceiver = new GpsReceiver();
-                context.registerReceiver(new GpsReceiver(), new IntentFilter(GPS_TARGET));
+                context.registerReceiver(gpsReceiver, new IntentFilter(GPS_TARGET));
                 Intent intent = new Intent(context, Gps.class);
                 intent.putExtra("target", GPS_TARGET);
                 context.startService(intent);
