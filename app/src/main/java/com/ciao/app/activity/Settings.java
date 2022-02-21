@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -144,6 +145,14 @@ public class Settings extends AppCompatActivity {
          * Progress dialog
          */
         private Dialog progressDialog;
+        /**
+         * GPS loading
+         */
+        private Boolean loading = false;
+        /**
+         * Broadcast receiver for Gps
+         */
+        private GpsReceiver gpsReceiver;
         /**
          * Counter for easter egg
          */
@@ -368,10 +377,23 @@ public class Settings extends AppCompatActivity {
             if (Functions.checkConnection(context)) {
                 progressDialog = Functions.makeLoadingDialog(context);
                 progressDialog.show();
+                gpsReceiver = new GpsReceiver();
                 context.registerReceiver(new GpsReceiver(), new IntentFilter(GPS_TARGET));
                 Intent intent = new Intent(context, Gps.class);
                 intent.putExtra("target", GPS_TARGET);
                 context.startService(intent);
+                loading = true;
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (loading) {
+                            context.unregisterReceiver(gpsReceiver);
+                            progressDialog.cancel();
+                            loading = false;
+                            Functions.makeErrorDialog(context, getString(R.string.error_retry)).show();
+                        }
+                    }
+                }, 10000);
             } else {
                 Functions.makeErrorDialog(context, getString(R.string.error_network)).show();
             }
@@ -390,6 +412,7 @@ public class Settings extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 context.unregisterReceiver(this);
+                loading = false;
                 double latitude = intent.getDoubleExtra("latitude", -1);
                 double longitude = intent.getDoubleExtra("longitude", -1);
                 if (latitude != -1 && longitude != -1) {

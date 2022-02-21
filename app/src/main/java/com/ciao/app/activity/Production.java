@@ -224,7 +224,7 @@ public class Production extends AppCompatActivity {
                 } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
                     windowInsetsController.show(WindowInsetsCompat.Type.systemBars());
                     fullscreen.removeView(videoView);
-                    content.addView(videoView, content.getChildCount() - 1);
+                    content.addView(videoView, 1);
                     fullscreen.setVisibility(View.GONE);
                 }
                 videoView.seekTo(position);
@@ -238,13 +238,7 @@ public class Production extends AppCompatActivity {
     public void rotate() {
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-                }
-            }, 2500);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             new Handler().postDelayed(new Runnable() {

@@ -72,4 +72,5 @@
     <string name="not_valid_conf_password">Confirmation password must match password</string>
     <string name="error_gps">Failed retrieving your location</string>
     <string name="tags">Tags :</string>
+    <string name="error_retry">Please retry</string>
 </resources>

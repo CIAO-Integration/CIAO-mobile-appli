@@ -44,6 +44,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:hint="@string/email"
                 android:inputType="textEmailAddress" />
 
             <TextView
@@ -58,6 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:hint="@string/password"
                 android:inputType="textPassword"
                 app:layout_constraintTop_toBottomOf="@+id/login.login.email" />
 
@@ -116,7 +118,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="text" />
+                android:hint="@string/username"
+                android:inputType="textPersonName" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -130,6 +133,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:hint="@string/email"
                 android:inputType="textEmailAddress" />
 
             <TextView
@@ -144,6 +148,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:hint="@string/password"
                 android:inputType="textPassword" />
 
             <TextView
@@ -158,6 +163,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:hint="@string/confirm_password"
                 android:inputType="textPassword" />
 
             <Button
