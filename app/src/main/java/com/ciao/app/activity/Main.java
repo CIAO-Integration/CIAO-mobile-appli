@@ -1,11 +1,20 @@
 package com.ciao.app.activity;
 
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,14 +22,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
@@ -36,12 +49,14 @@ import com.ciao.app.BuildConfig;
 import com.ciao.app.Database;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
+import com.ciao.app.service.JsonFromUrl;
 import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -49,6 +64,10 @@ import java.util.HashMap;
  * Activity showing the main screen
  */
 public class Main extends AppCompatActivity {
+    /**
+     * Target for broadcast receiver
+     */
+    private final String TARGET = "Main";
     /**
      * Shared preferences
      */
@@ -65,6 +84,14 @@ public class Main extends AppCompatActivity {
      * Search bar
      */
     private EditText searchBar;
+    /**
+     * Progress dialog
+     */
+    private Dialog progressDialog;
+    /**
+     * Filename
+     */
+    private String name;
 
     /**
      * Create Activity
@@ -76,6 +103,8 @@ public class Main extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        checkUpdate();
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         key = sharedPreferences.getString("key", null);
@@ -179,6 +208,17 @@ public class Main extends AppCompatActivity {
     }
 
     /**
+     * Check update from GitHub
+     */
+    public void checkUpdate() {
+        registerReceiver(new UpdateReceiver(), new IntentFilter(TARGET));
+        Intent intent = new Intent(this, JsonFromUrl.class);
+        intent.putExtra("target", TARGET);
+        intent.putExtra("url", "https://api.github.com/repos/CIAO-Integration/CIAO-mobile-appli/releases/latest");
+        startService(intent);
+    }
+
+    /**
      * Open navigation drawer
      */
     public void openDrawer() {
@@ -267,7 +307,7 @@ public class Main extends AppCompatActivity {
             holder.card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Boolean connected = Functions.checkConnection(context);
+                    boolean connected = Functions.checkConnection(context);
                     if (connected) {
                         Intent intent = new Intent(context, Production.class);
                         intent.putExtra("id", id);
@@ -328,7 +368,6 @@ public class Main extends AppCompatActivity {
             }
         }
     }
-
 
     /**
      * Broadcast receiver for JsonFromUrl
@@ -402,6 +441,138 @@ public class Main extends AppCompatActivity {
             }
             swipeRefreshLayout.setRefreshing(false);
             spinner.setSelection(0);
+        }
+    }
+
+    /**
+     * Broadcast receiver for JsonFromUrl
+     */
+    private class UpdateReceiver extends BroadcastReceiver {
+        /**
+         * On receive
+         *
+         * @param context Context
+         * @param intent  Intent
+         */
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            unregisterReceiver(this);
+            if (intent.getStringExtra("json") != null) {
+                try {
+                    JSONObject json = new JSONObject(intent.getStringExtra("json"));
+                    String currentVersion = BuildConfig.VERSION_NAME;
+                    String remoteVersion = json.getString("tag_name");
+                    if (Functions.isGreater(remoteVersion, currentVersion)) {
+                        JSONArray array = json.getJSONArray("assets");
+                        for (int i = 0; i < array.length(); i++) {
+                            String type = array.getJSONObject(0).getString("content_type");
+                            if (type.equals("application/vnd.android.package-archive")) { //contains apk
+                                name = array.getJSONObject(0).getString("name");
+                                String url = array.getJSONObject(0).getString("browser_download_url");
+                                String changelog = json.getString("body");
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                builder.setTitle(getString(R.string.new_update));
+                                builder.setMessage(getString(R.string.update_message, currentVersion + " -> " + remoteVersion, changelog));
+                                builder.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        ProgressBar progressBar = new ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal);
+                                        progressBar.setIndeterminate(false);
+                                        TextView percentage = new TextView(context);
+                                        percentage.setText("0%");
+                                        LinearLayout linearLayout = new LinearLayout(context);
+                                        linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                        linearLayout.setGravity(Gravity.START);
+                                        linearLayout.addView(progressBar);
+                                        linearLayout.addView(percentage);
+                                        int padding = (int) getResources().getDimension(R.dimen.dialog_padding);
+                                        linearLayout.setPadding(padding, padding, padding, padding);
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                        builder.setTitle(context.getString(R.string.downloading));
+                                        builder.setView(linearLayout);
+                                        builder.setCancelable(false);
+                                        progressDialog = builder.create();
+                                        progressDialog.show();
+
+                                        registerReceiver(new DownloadManagerReceiver(), new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+                                        DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                                        long DOWNLOAD_ID = downloadManager.enqueue(new DownloadManager.Request(Uri.parse(url))
+                                                .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
+                                                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name));
+
+                                        //download progress
+                                        Thread thread = new Thread(new Runnable() {
+                                            @SuppressLint("Range")
+                                            @Override
+                                            public void run() {
+                                                boolean running = true;
+                                                long total;
+                                                long downloaded;
+                                                int progress = 0;
+                                                while (running) {
+                                                    Cursor cursor = downloadManager.query(new DownloadManager.Query().setFilterById(DOWNLOAD_ID));
+                                                    cursor.moveToFirst();
+                                                    total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                                                    downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                                                    progress = (int) ((downloaded * 100) / total);
+                                                    progressBar.setProgress(progress);
+                                                    percentage.setText(progress + "%");
+                                                    if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+                                                        name = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_TITLE));
+                                                    }
+                                                    try {
+                                                        Thread.sleep(100);
+                                                    } catch (InterruptedException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    if (downloaded >= total && total != -1) {
+                                                        running = false;
+                                                    }
+                                                }
+                                            }
+                                        });
+                                        thread.start();
+                                    }
+                                });
+                                builder.setNegativeButton(getString(R.string.later), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                });
+                                builder.show();
+                                break;
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Functions.makeErrorDialog(context, e.toString()).show();
+                }
+            }
+        }
+    }
+
+    /**
+     * Broadcast receiver for DownloadManager
+     */
+    private class DownloadManagerReceiver extends BroadcastReceiver {
+        /**
+         * On receive
+         *
+         * @param context Context
+         * @param intent  Intent
+         */
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            unregisterReceiver(this);
+            progressDialog.cancel();
+            Intent intent1 = new Intent(Intent.ACTION_VIEW);
+            intent1.setDataAndType(FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), name)), "application/vnd.android.package-archive");
+            intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent1);
         }
     }
 }

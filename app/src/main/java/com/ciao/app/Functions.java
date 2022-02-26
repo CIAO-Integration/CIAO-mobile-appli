@@ -193,6 +193,7 @@ public class Functions {
         Intent intent = new Intent(context, JsonFromUrl.class);
         intent.putExtra("arguments", (Serializable) arguments);
         intent.putExtra("target", target);
+        intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
         context.startService(intent);
     }
 
@@ -291,6 +292,8 @@ public class Functions {
         LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout.setGravity(Gravity.CENTER);
+        int padding = (int) context.getResources().getDimension(R.dimen.dialog_padding);
+        linearLayout.setPadding(padding, padding, padding, padding);
         linearLayout.addView(progressBar);
         linearLayout.addView(textView);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -306,9 +309,54 @@ public class Functions {
      * @param context Context
      * @return Connected
      */
-    public static Boolean checkConnection(Context context) {
+    public static boolean checkConnection(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
+    }
+
+    /**
+     * Check if one version is greater than another version
+     *
+     * @param version1 Version 1
+     * @param version2 Version 2
+     * @return Is greater
+     */
+    public static boolean isGreater(String version1, String version2) {
+        int[] v1 = stringToInt(version1.split("\\."));
+        int[] v2 = stringToInt(version2.split("\\."));
+        if (v1[0] > v2[0]) {
+            return true;
+        } else if (v1[0] == v2[0]) {
+            if (v1[1] > v2[1]) {
+                return true;
+            } else if (v1[1] == v2[1]) {
+                if (v1[2] > v2[2]) {
+                    return true;
+                } else if (v1[2] == v2[2]) {
+                    return false;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Convert an array of String of an array of Integer
+     *
+     * @param string Array of String
+     * @return Array of Integer
+     */
+    public static int[] stringToInt(String[] string) {
+        int[] integer = new int[3];
+        for (int i = 0; i < string.length; i++) {
+            integer[i] = Integer.parseInt(string[i]);
+        }
+        return integer;
     }
 }

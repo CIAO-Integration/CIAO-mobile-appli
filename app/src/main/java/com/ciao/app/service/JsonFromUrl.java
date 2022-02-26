@@ -13,7 +13,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.ciao.app.BuildConfig;
 
 import java.util.Map;
 
@@ -29,6 +28,10 @@ public class JsonFromUrl extends Service implements Runnable {
      * Target for broadcast receiver
      */
     private String target;
+    /**
+     * URL
+     */
+    private String url;
 
     /**
      * On bind
@@ -54,6 +57,7 @@ public class JsonFromUrl extends Service implements Runnable {
     public int onStartCommand(Intent intent, int flags, int startId) {
         arguments = (Map<String, String>) intent.getSerializableExtra("arguments");
         target = intent.getStringExtra("target");
+        url = intent.getStringExtra("url");
         Thread thread = new Thread(this);
         thread.start();
         return super.onStartCommand(intent, flags, startId);
@@ -64,10 +68,15 @@ public class JsonFromUrl extends Service implements Runnable {
      */
     @Override
     public void run() {
-        String url = BuildConfig.WEB_SERVER_URL;
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         Intent intent = new Intent(target);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        int method;
+        if (arguments == null) {
+            method = Request.Method.GET;
+        } else {
+            method = Request.Method.POST;
+        }
+        StringRequest stringRequest = new StringRequest(method, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d("JsonFromUrl", response);

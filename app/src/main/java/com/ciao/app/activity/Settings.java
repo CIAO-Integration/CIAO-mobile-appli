@@ -148,7 +148,7 @@ public class Settings extends AppCompatActivity {
         /**
          * GPS loading
          */
-        private Boolean loading = false;
+        private boolean loading = false;
         /**
          * Broadcast receiver for Gps
          */
@@ -194,7 +194,7 @@ public class Settings extends AppCompatActivity {
                             Functions.setTheme(theme);
                             break;
                         case "location_mode":
-                            Boolean location_mode = sharedPreferences.getBoolean("location_mode", false);
+                            boolean location_mode = sharedPreferences.getBoolean("location_mode", false);
                             if (location_mode) {
                                 location.setSummary(sharedPreferences.getString("location", context.getString(R.string.undefined)));
                                 location.setVisible(true);

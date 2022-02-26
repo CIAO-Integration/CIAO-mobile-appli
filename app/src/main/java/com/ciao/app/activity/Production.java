@@ -75,7 +75,7 @@ public class Production extends AppCompatActivity {
     /**
      * Video view status
      */
-    private Boolean prepared = false;
+    private boolean prepared = false;
     /**
      * Tags
      */
@@ -239,14 +239,14 @@ public class Production extends AppCompatActivity {
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
                 }
             }, 2500);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         }
     }
 

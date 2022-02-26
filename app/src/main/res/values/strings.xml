@@ -73,4 +73,9 @@
     <string name="error_gps">Failed retrieving your location</string>
     <string name="tags">Tags :</string>
     <string name="error_retry">Please retry</string>
+    <string name="yes">Yes</string>
+    <string name="later">Later</string>
+    <string name="new_update">New update</string>
+    <string name="downloading">Downloading</string>
+    <string name="update_message">Do you want to update ?\n\nVersion : %1$s\nChangelog :\n%2$s</string>
 </resources>

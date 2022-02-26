@@ -61,12 +61,12 @@ public class TextFromUrl extends Service implements Runnable {
         try {
             URL url = new URL(path);
             Scanner scanner = new Scanner(url.openStream());
-            String text = "";
+            StringBuilder text = new StringBuilder();
             while (scanner.hasNextLine()) {
-                text += scanner.nextLine();
+                text.append(scanner.nextLine());
             }
             scanner.close();
-            intent.putExtra("text", text);
+            intent.putExtra("text", text.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }

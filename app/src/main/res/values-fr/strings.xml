@@ -73,4 +73,9 @@
     <string name="error_gps">Obtention de votre localisation échouée</string>
     <string name="tags">Tags :</string>
     <string name="error_retry">Veuillez réessayer</string>
+    <string name="yes">Oui</string>
+    <string name="later">Plus tard</string>
+    <string name="new_update">Nouvelle mise à jour</string>
+    <string name="downloading">Téléchargement</string>
+    <string name="update_message">Voulez vous faire la mise à jour ?\n\nVersion : %1$s\nChangelog :\n%2$s</string>
 </resources>

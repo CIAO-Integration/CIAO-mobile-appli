@@ -407,6 +407,7 @@ public class ArticleBuilder {
             arguments.put("key", key);
             Intent intent = new Intent(context, JsonFromUrl.class);
             intent.putExtra("arguments", (Serializable) arguments);
+            intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
             context.startService(intent);
         }
     }

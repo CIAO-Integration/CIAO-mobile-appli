@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.ciao.app.service.JsonFromUrl;
@@ -59,19 +60,19 @@ public class Login extends AppCompatActivity {
     /**
      * Username valid
      */
-    private Boolean registerUsernameValid = false;
+    private boolean registerUsernameValid = false;
     /**
      * Email valid
      */
-    private Boolean registerEmailValid = false;
+    private boolean registerEmailValid = false;
     /**
      * Password valid
      */
-    private Boolean registerPasswordValid = false;
+    private boolean registerPasswordValid = false;
     /**
      * Confirmation password valid
      */
-    private Boolean registerConfPasswordValid = false;
+    private boolean registerConfPasswordValid = false;
     /**
      * Login email
      */
@@ -232,6 +233,7 @@ public class Login extends AppCompatActivity {
             Intent intent = new Intent(this, JsonFromUrl.class);
             intent.putExtra("arguments", (Serializable) arguments);
             intent.putExtra("target", TARGET);
+            intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
             startService(intent);
         } else {
             Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
@@ -270,6 +272,7 @@ public class Login extends AppCompatActivity {
                 Intent intent = new Intent(this, JsonFromUrl.class);
                 intent.putExtra("arguments", (Serializable) arguments);
                 intent.putExtra("target", TARGET);
+                intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
                 startService(intent);
             }
         } else {
