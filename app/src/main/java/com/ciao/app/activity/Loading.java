@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.ciao.app.BuildConfig;
+import com.ciao.app.Database;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.ciao.app.service.JsonFromUrl;
@@ -105,7 +106,7 @@ public class Loading extends AppCompatActivity {
                     String status = json.getString("status");
                     if (status.equals("200")) {
                         JSONArray array = json.getJSONArray("list");
-                        Functions.storeTimeline(context, array);
+                        Functions.storeTimeline(context, array, Database.TABLE_NAME);
                         startActivity(new Intent(context, Main.class));
                         finish();
                     } else {

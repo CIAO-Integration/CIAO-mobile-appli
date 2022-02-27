@@ -24,7 +24,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -41,12 +40,10 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.ciao.app.BuildConfig;
-import com.ciao.app.Database;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.ciao.app.service.JsonFromUrl;
@@ -180,6 +177,7 @@ public class Main extends AppCompatActivity {
                 Drawable placeholder = AppCompatResources.getDrawable(this, R.drawable.no_avatar);
                 Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
             }
+            Functions.initNotifications(this);
         }
 
         searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -303,14 +301,14 @@ public class Main extends AppCompatActivity {
             if (data.get(position).get("type").equals("video")) {
                 holder.image.setForeground(AppCompatResources.getDrawable(context, android.R.drawable.ic_media_play));
             }
-            String id = data.get(position).get("id");
+            String productionId = data.get(position).get("id");
             holder.card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     boolean connected = Functions.checkConnection(context);
                     if (connected) {
                         Intent intent = new Intent(context, Production.class);
-                        intent.putExtra("id", id);
+                        intent.putExtra("productionId", productionId);
                         context.startActivity(intent);
                     } else {
                         Functions.makeErrorDialog(context, context.getString(R.string.error_network)).show();
@@ -366,81 +364,6 @@ public class Main extends AppCompatActivity {
                 image = view.findViewById(R.id.item_image);
                 title = view.findViewById(R.id.item_title);
             }
-        }
-    }
-
-    /**
-     * Broadcast receiver for JsonFromUrl
-     */
-    public static class RefreshReceiver extends BroadcastReceiver {
-        /**
-         * Timeline filter
-         */
-        private final String filter;
-        /**
-         * Timeline location
-         */
-        private final String location;
-        /**
-         * Recycler view
-         */
-        private final RecyclerView recyclerView;
-        /**
-         * Swipe refresh layout
-         */
-        private final SwipeRefreshLayout swipeRefreshLayout;
-        /**
-         * Spinner
-         */
-        private final Spinner spinner;
-
-        /**
-         * Constructor
-         *
-         * @param filter             Filter
-         * @param location           Location
-         * @param recyclerView       RecyclerView
-         * @param swipeRefreshLayout SwiperRefreshLayout
-         * @param spinner            Spinner
-         */
-        public RefreshReceiver(String filter, String location, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout, Spinner spinner) {
-            this.filter = filter;
-            this.location = location;
-            this.recyclerView = recyclerView;
-            this.swipeRefreshLayout = swipeRefreshLayout;
-            this.spinner = spinner;
-        }
-
-        /**
-         * On receive
-         *
-         * @param context Context
-         * @param intent  Intent
-         */
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            context.unregisterReceiver(this);
-            if (intent.getStringExtra("json") != null) {
-                try {
-                    JSONObject json = new JSONObject(intent.getStringExtra("json"));
-                    String status = json.getString("status");
-                    if (status.equals("200")) {
-                        JSONArray array = json.getJSONArray("list");
-                        Functions.storeTimeline(context, array);
-                        Database database = new Database(context);
-                        Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(context, database.getRowsByFilter(filter, location));
-                        database.close();
-                        recyclerView.setAdapter(recyclerViewAdapter);
-                    } else {
-                        Functions.makeErrorDialog(context, context.getString(R.string.error_message, status, json.getString("message"))).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Functions.makeErrorDialog(context, e.toString()).show();
-                }
-            }
-            swipeRefreshLayout.setRefreshing(false);
-            spinner.setSelection(0);
         }
     }
 

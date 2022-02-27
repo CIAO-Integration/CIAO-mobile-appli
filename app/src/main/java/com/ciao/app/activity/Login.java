@@ -1,5 +1,6 @@
 package com.ciao.app.activity;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -105,6 +106,10 @@ public class Login extends AppCompatActivity {
      * Register
      */
     private LinearLayout register;
+    /**
+     * Progress dialog
+     */
+    private Dialog progressDialog;
 
     /**
      * Create Activity
@@ -235,6 +240,8 @@ public class Login extends AppCompatActivity {
             intent.putExtra("target", TARGET);
             intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
             startService(intent);
+            progressDialog = Functions.makeLoadingDialog(this);
+            progressDialog.show();
         } else {
             Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
         }
@@ -274,6 +281,8 @@ public class Login extends AppCompatActivity {
                 intent.putExtra("target", TARGET);
                 intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
                 startService(intent);
+                progressDialog = Functions.makeLoadingDialog(this);
+                progressDialog.show();
             }
         } else {
             Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
@@ -332,6 +341,7 @@ public class Login extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             unregisterReceiver(this);
+            progressDialog.cancel();
             if (intent.getStringExtra("json") != null) {
                 try {
                     JSONObject json = new JSONObject(intent.getStringExtra("json"));
@@ -371,6 +381,7 @@ public class Login extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             unregisterReceiver(this);
+            progressDialog.cancel();
             if (intent.getStringExtra("json") != null) {
                 try {
                     JSONObject json = new JSONObject(intent.getStringExtra("json"));

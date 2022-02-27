@@ -1,14 +1,23 @@
 package com.ciao.app;
 
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,14 +29,22 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.ciao.app.activity.Main;
+import com.ciao.app.activity.Production;
 import com.ciao.app.databinding.FragmentMainBinding;
+import com.ciao.app.receiver.RefreshReceiver;
 import com.ciao.app.service.JsonFromUrl;
+import com.ciao.app.service.NotificationJob;
+import com.ciao.app.view.Tag;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,6 +71,7 @@ public class Functions {
      * @param which   Which Fragment
      */
     public static void initFragment(Context context, FragmentMainBinding binding, int which) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         Spinner spinner = binding.mainSort;
         RecyclerView recyclerView = binding.mainList;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -64,7 +82,7 @@ public class Functions {
             case R.string.browse:
                 break;
             case R.string.around:
-                location = PreferenceManager.getDefaultSharedPreferences(context).getString("location", null);
+                location = sharedPreferences.getString("location", null);
                 break;
             case R.string.news:
                 filter = "actualite";
@@ -104,7 +122,7 @@ public class Functions {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshTimeline(context, new Main.RefreshReceiver(finalFilter, finalLocation, recyclerView, swipeRefreshLayout, spinner), "Refresh");
+                refreshTimeline(context, new RefreshReceiver(finalFilter, finalLocation, recyclerView, swipeRefreshLayout, spinner), "Refresh");
             }
         });
 
@@ -177,6 +195,23 @@ public class Functions {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+
+        if (sharedPreferences.getString("key", null) != null && which != R.string.browse && which != R.string.around) {
+            int verticalMargin = (int) context.getResources().getDimension(R.dimen.activity_vertical_margin);
+            int horizontalMargin = (int) context.getResources().getDimension(R.dimen.activity_horizontal_margin);
+
+            ConstraintLayout constraintLayout = binding.mainActionBar;
+            Tag tag = new Tag(context, filter);
+            tag.setId(View.generateViewId());
+            constraintLayout.addView(tag);
+
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(constraintLayout);
+            constraintSet.connect(tag.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, horizontalMargin);
+            constraintSet.connect(tag.getId(), ConstraintSet.BOTTOM, constraintLayout.getId(), ConstraintSet.BOTTOM, verticalMargin);
+            constraintSet.connect(tag.getId(), ConstraintSet.TOP, constraintLayout.getId(), ConstraintSet.TOP, verticalMargin);
+            constraintSet.applyTo(constraintLayout);
+        }
     }
 
     /**
@@ -194,7 +229,11 @@ public class Functions {
         intent.putExtra("arguments", (Serializable) arguments);
         intent.putExtra("target", target);
         intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
-        context.startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
     }
 
     /**
@@ -204,7 +243,7 @@ public class Functions {
      * @param array   Data
      * @throws JSONException Bad JSON
      */
-    public static void storeTimeline(Context context, JSONArray array) throws JSONException {
+    public static void storeTimeline(Context context, JSONArray array, String table) throws JSONException {
         ArrayList<HashMap<String, String>> rows = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
             JSONObject item = array.getJSONObject(i);
@@ -222,8 +261,8 @@ public class Functions {
             rows.add(row);
         }
         Database database = new Database(context);
-        database.clear();
-        database.insertInto(rows);
+        database.clear(table);
+        database.insertInto(table, rows);
         database.close();
     }
 
@@ -358,5 +397,76 @@ public class Functions {
             integer[i] = Integer.parseInt(string[i]);
         }
         return integer;
+    }
+
+    /**
+     * Initiate notification system
+     *
+     * @param context Context
+     */
+    public static void initNotifications(Context context) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getString("key", null) != null) {
+            JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
+            boolean found = false;
+            for (JobInfo jobInfo : jobScheduler.getAllPendingJobs()) {
+                if (jobInfo.getId() == 0) {
+                    found = true;
+                    Log.d("Notifications", "service already running");
+                    break;
+                }
+            }
+            if (!found) {
+                Log.d("Notifications", "started service");
+                createNotificationChannel(context);
+                ComponentName componentName = new ComponentName(context, NotificationJob.class);
+                JobInfo.Builder builder = new JobInfo.Builder(0, componentName);
+                builder.setMinimumLatency(1000 * 60 * 55);
+                builder.setOverrideDeadline(1000 * 60 * 65);
+                builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+                builder.setRequiresCharging(false);
+                builder.setRequiresDeviceIdle(false);
+                jobScheduler.schedule(builder.build());
+            }
+        }
+    }
+
+    /**
+     * Create notification channel
+     *
+     * @param context Context
+     */
+    public static void createNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("CIAO", context.getString(R.string.app_name) + " " + context.getString(R.string.notifications), NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription(context.getString(R.string.notifications_description));
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    /**
+     * Make a notification
+     *
+     * @param context      Context
+     * @param title        Title
+     * @param text         Text
+     * @param productionId Id of production
+     */
+    public static void makeNotification(Context context, String title, String text, String productionId) {
+        Intent intent = new Intent(context, Production.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("productionId", productionId);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) (Math.random() * 1000), intent, PendingIntent.FLAG_IMMUTABLE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "CIAO")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(text))
+                .setContentTitle(title)
+                .setContentText(text)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        notificationManager.notify((int) (Math.random() * 1000), builder.build());
     }
 }

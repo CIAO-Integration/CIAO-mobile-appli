@@ -78,4 +78,9 @@
     <string name="new_update">New update</string>
     <string name="downloading">Downloading</string>
     <string name="update_message">Do you want to update ?\n\nVersion : %1$s\nChangelog :\n%2$s</string>
+    <string name="notifications_restored">Restored notifications</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_description">Notifies you when a new production matching your centers of interrest is released</string>
+    <string name="new_production">A new production is out</string>
+    <string name="tag_checked">✔</string>
 </resources>

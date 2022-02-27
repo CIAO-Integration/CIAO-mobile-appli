@@ -19,7 +19,11 @@ public class Database extends SQLiteOpenHelper {
     /**
      * Name of table
      */
-    private final String TABLE_NAME = "CIAO";
+    public static final String TABLE_NAME = "CIAO";
+    /**
+     * Name of temp table
+     */
+    public static final String TMP_TABLE_NAME = "TMP";
 
     /**
      * Constructor
@@ -38,7 +42,8 @@ public class Database extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(id TEXT, thumbnail TEXT, title TEXT, tags TEXT, date TEXT, location TEXT, type TEXT, path TEXT, link TEXT, description TEXT)");
-        Log.d("database", "created table");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TMP_TABLE_NAME + "(id TEXT, thumbnail TEXT, title TEXT, tags TEXT, date TEXT, location TEXT, type TEXT, path TEXT, link TEXT, description TEXT)");
+        Log.d("database", "created tables");
     }
 
     /**
@@ -50,6 +55,8 @@ public class Database extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TMP_TABLE_NAME);
         Log.d("database", "upgrade");
         onCreate(db);
     }
@@ -57,9 +64,10 @@ public class Database extends SQLiteOpenHelper {
     /**
      * Insert rows into database
      *
-     * @param rows Rows
+     * @param table Table
+     * @param rows  Rows
      */
-    public void insertInto(ArrayList<HashMap<String, String>> rows) {
+    public void insertInto(String table, ArrayList<HashMap<String, String>> rows) {
         SQLiteDatabase db = this.getWritableDatabase();
         for (HashMap<String, String> row : rows) {
             ContentValues contentValues = new ContentValues();
@@ -73,49 +81,22 @@ public class Database extends SQLiteOpenHelper {
             contentValues.put("path", row.get("path"));
             contentValues.put("link", row.get("link"));
             contentValues.put("description", row.get("description"));
-            db.insert(TABLE_NAME, null, contentValues);
+            db.insert(table, null, contentValues);
         }
         db.close();
-        Log.d("database", toString());
+        Log.d("database", toString(table));
     }
 
     /**
      * Clear database
-     */
-    public void clear() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("DELETE FROM " + TABLE_NAME);
-        db.close();
-        Log.d("database", "cleared database");
-    }
-
-    /**
-     * Get rows of database
      *
-     * @return Rows
+     * @param table Table
      */
-    public ArrayList<HashMap<String, String>> getRows() {
-        String query = "SELECT * FROM " + TABLE_NAME;
-        ArrayList<HashMap<String, String>> rows = new ArrayList<>();
+    public void clear(String table) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        while (cursor.moveToNext()) {
-            HashMap<String, String> row = new HashMap<>();
-            row.put("id", cursor.getString(0));
-            row.put("thumbnail", cursor.getString(1));
-            row.put("title", cursor.getString(2));
-            row.put("tags", cursor.getString(3));
-            row.put("date", cursor.getString(4));
-            row.put("location", cursor.getString(5));
-            row.put("type", cursor.getString(6));
-            row.put("path", cursor.getString(7));
-            row.put("link", cursor.getString(8));
-            row.put("description", cursor.getString(9));
-            rows.add(row);
-        }
-        cursor.close();
+        db.execSQL("DELETE FROM " + table);
         db.close();
-        return rows;
+        Log.d("database", "cleared table " + table);
     }
 
     /**
@@ -187,12 +168,13 @@ public class Database extends SQLiteOpenHelper {
     /**
      * To string
      *
+     * @param table Table
      * @return String
      */
-    public String toString() {
-        String string = "";
+    public String toString(String table) {
+        String string = table + " :\n";
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + table, null);
         while (cursor.moveToNext()) {
             string += cursor.getString(0) + " | " +
                     cursor.getString(1) + " | " +
@@ -235,5 +217,34 @@ public class Database extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return row;
+    }
+
+    /**
+     * Compare tables
+     *
+     * @return Difference
+     */
+    public ArrayList<HashMap<String, String>> compareTables() {
+        String query = "SELECT * FROM " + TMP_TABLE_NAME + " WHERE id NOT IN (SELECT id FROM " + TABLE_NAME + ")";
+        ArrayList<HashMap<String, String>> rows = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            HashMap<String, String> row = new HashMap<>();
+            row.put("id", cursor.getString(0));
+            row.put("thumbnail", cursor.getString(1));
+            row.put("title", cursor.getString(2));
+            row.put("tags", cursor.getString(3));
+            row.put("date", cursor.getString(4));
+            row.put("location", cursor.getString(5));
+            row.put("type", cursor.getString(6));
+            row.put("path", cursor.getString(7));
+            row.put("link", cursor.getString(8));
+            row.put("description", cursor.getString(9));
+            rows.add(row);
+        }
+        cursor.close();
+        db.close();
+        return rows;
     }
 }

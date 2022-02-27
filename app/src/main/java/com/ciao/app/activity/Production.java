@@ -132,7 +132,7 @@ public class Production extends AppCompatActivity {
         progressDialog.show();
 
         Database database = new Database(this);
-        HashMap<String, String> row = database.getRowById(getIntent().getStringExtra("id"));
+        HashMap<String, String> row = database.getRowById(getIntent().getStringExtra("productionId"));
         database.close();
 
         type = row.get("type");

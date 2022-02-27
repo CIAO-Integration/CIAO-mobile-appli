@@ -136,7 +136,7 @@ public class Settings extends AppCompatActivity {
         /**
          * On permission request
          */
-        private ActivityResultLauncher<String> requestPermissionLauncher;
+        private ActivityResultLauncher<String[]> requestPermissionLauncher;
         /**
          * Location preference
          */
@@ -177,21 +177,23 @@ public class Settings extends AppCompatActivity {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             editor = sharedPreferences.edit();
             key = sharedPreferences.getString("key", null);
-            requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
+            requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean fineLocationGranted = result.get(Manifest.permission.ACCESS_FINE_LOCATION);
+                boolean coarseLocationGranted = result.get(Manifest.permission.ACCESS_COARSE_LOCATION);
+                if (fineLocationGranted || coarseLocationGranted) {
                     Snackbar.make(getActivity().findViewById(android.R.id.content), getString(R.string.perm_granted), Snackbar.LENGTH_SHORT).show();
                     getLocation();
                 } else {
                     Snackbar.make(getActivity().findViewById(android.R.id.content), getString(R.string.perm_denied), Snackbar.LENGTH_SHORT).show();
                 }
             });
+
             onSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                     switch (key) {
                         case "theme":
-                            String theme = sharedPreferences.getString(key, "light");
-                            Functions.setTheme(theme);
+                            Functions.setTheme(sharedPreferences.getString(key, "light"));
                             break;
                         case "location_mode":
                             boolean location_mode = sharedPreferences.getBoolean("location_mode", false);
@@ -238,16 +240,18 @@ public class Settings extends AppCompatActivity {
                             int choice = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
                             switch (choice) {
                                 case 0:
-                                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                         getLocation();
                                     } else {
-                                        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+                                        requestPermissionLauncher.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
                                     }
                                     break;
                                 case 1:
                                     String[] locations = sharedPreferences.getString("locations", "").split(";");
                                     Spinner spinner = new Spinner(context);
                                     spinner.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, locations));
+                                    int padding = (int) getResources().getDimension(R.dimen.dialog_padding);
+                                    spinner.setPadding(padding, padding, padding, padding);
                                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                     builder.setView(spinner);
                                     builder.setTitle(getString(R.string.set_location));
@@ -264,6 +268,7 @@ public class Settings extends AppCompatActivity {
                                             arguments.put("key", key);
                                             Intent intent = new Intent(context, JsonFromUrl.class);
                                             intent.putExtra("arguments", (Serializable) arguments);
+                                            intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
                                             context.startService(intent);
                                         }
                                     });
@@ -318,6 +323,7 @@ public class Settings extends AppCompatActivity {
                     arguments.put("key", key);
                     Intent intent = new Intent(context, JsonFromUrl.class);
                     intent.putExtra("arguments", (Serializable) arguments);
+                    intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
                     context.startService(intent);
 
                     startActivity(new Intent(getContext(), Loading.class));
@@ -430,6 +436,7 @@ public class Settings extends AppCompatActivity {
                         arguments.put("key", key);
                         Intent intent1 = new Intent(context, JsonFromUrl.class);
                         intent1.putExtra("arguments", (Serializable) arguments);
+                        intent1.putExtra("url", BuildConfig.WEB_SERVER_URL);
                         context.startService(intent1);
                     } catch (IOException e) {
                         e.printStackTrace();
