@@ -36,10 +36,6 @@ public class Tag extends CardView {
      */
     private SharedPreferences.Editor editor;
     /**
-     * Status
-     */
-    private Boolean status;
-    /**
      * Status text
      */
     private TextView statusTextView;
@@ -95,21 +91,16 @@ public class Tag extends CardView {
             statusTextView.setPadding(0, 4, 8, 4);
             statusTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
             statusTextView.setText(context.getString(R.string.tag_checked));
-
-            ci = new ArrayList<>(Arrays.asList(sharedPreferences.getString("ci", "").split(",")));
-            if (ci.contains(text)) {
-                status = true;
-            } else {
-                status = false;
-                statusTextView.setVisibility(GONE);
-            }
             linearLayout.addView(statusTextView);
+
             setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     toggleStatus();
                 }
             });
+
+            update();
         }
     }
 
@@ -117,18 +108,13 @@ public class Tag extends CardView {
      * Toggle status of tag
      */
     private void toggleStatus() {
-        if (status != null && statusTextView != null) {
-            ci = new ArrayList<>(Arrays.asList(sharedPreferences.getString("ci", "").split(",")));
-            if (status) {
-                status = false;
-                statusTextView.setVisibility(GONE);
-                ci.remove(text);
-            } else {
-                status = true;
-                statusTextView.setVisibility(VISIBLE);
-                ci.add(text);
-            }
+        ci = new ArrayList<>(Arrays.asList(sharedPreferences.getString("ci", "").split(",")));
+        if (ci.contains(text)) {
+            ci.remove(text);
+        } else {
+            ci.add(text);
         }
+
         String ciString = TextUtils.join(",", ci);
         editor.putString("ci", ciString);
         editor.apply();
@@ -140,5 +126,19 @@ public class Tag extends CardView {
         intent.putExtra("arguments", (Serializable) arguments);
         intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
         context.startService(intent);
+
+        update();
+    }
+
+    /**
+     * Update view visibility
+     */
+    public void update() {
+        ci = new ArrayList<>(Arrays.asList(sharedPreferences.getString("ci", "").split(",")));
+        if (ci.contains(text)) {
+            statusTextView.setVisibility(VISIBLE);
+        } else {
+            statusTextView.setVisibility(GONE);
+        }
     }
 }

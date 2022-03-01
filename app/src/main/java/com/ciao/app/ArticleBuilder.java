@@ -95,6 +95,10 @@ public class ArticleBuilder {
      * Tags
      */
     private final String tags;
+    /**
+     * Author
+     */
+    private final String author;
 
     /**
      * Constructor
@@ -104,11 +108,12 @@ public class ArticleBuilder {
      * @param text    Text
      * @param tags    Tags
      */
-    public ArticleBuilder(Context context, LinearLayout article, String text, String tags) {
+    public ArticleBuilder(Context context, LinearLayout article, String text, String tags, String author) {
         this.context = context;
         this.article = article;
         this.text = text;
         this.tags = tags;
+        this.author = author;
     }
 
     /**
@@ -173,6 +178,7 @@ public class ArticleBuilder {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        buildAuthor();
         buildTags();
     }
 
@@ -262,6 +268,18 @@ public class ArticleBuilder {
         article.addView(textView);
     }
 
+
+    /**
+     * Build author
+     */
+    public void buildAuthor() {
+        TextView textView = new TextView(context);
+        textView.setPadding(0, 8, 0, 4);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, P_SIZE);
+        textView.setText(context.getString(R.string.author, author));
+        article.addView(textView);
+    }
+
     /**
      * Build tags
      */
@@ -269,7 +287,7 @@ public class ArticleBuilder {
         LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout.setGravity(Gravity.CENTER_VERTICAL);
-        linearLayout.setPadding(0, 8, 0, 8);
+        linearLayout.setPadding(0, 4, 0, 8);
         TextView textView = new TextView(context);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, P_SIZE);
         textView.setText(context.getString(R.string.tags));

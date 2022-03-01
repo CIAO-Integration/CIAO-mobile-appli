@@ -10,9 +10,9 @@
         android:label="@string/browse" />
 
     <fragment
-        android:id="@+id/nav_around"
-        android:name="com.ciao.app.activity.MainFragment.AroundFragment"
-        android:label="@string/around" />
+        android:id="@+id/nav_nearby"
+        android:name="com.ciao.app.activity.MainFragment.NearbyFragment"
+        android:label="@string/nearby" />
 
     <fragment
         android:id="@+id/nav_news"

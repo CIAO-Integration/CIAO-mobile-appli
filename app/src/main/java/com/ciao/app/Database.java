@@ -41,8 +41,8 @@ public class Database extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(id TEXT, thumbnail TEXT, title TEXT, tags TEXT, date TEXT, location TEXT, type TEXT, path TEXT, link TEXT, description TEXT)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + TMP_TABLE_NAME + "(id TEXT, thumbnail TEXT, title TEXT, tags TEXT, date TEXT, location TEXT, type TEXT, path TEXT, link TEXT, description TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(id TEXT, thumbnail TEXT, title TEXT, tags TEXT, date TEXT, location TEXT, type TEXT, path TEXT, link TEXT, description TEXT, author TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TMP_TABLE_NAME + "(id TEXT, thumbnail TEXT, title TEXT, tags TEXT, date TEXT, location TEXT, type TEXT, path TEXT, link TEXT, description TEXT, author TEXT)");
         Log.d("database", "created tables");
     }
 
@@ -81,6 +81,7 @@ public class Database extends SQLiteOpenHelper {
             contentValues.put("path", row.get("path"));
             contentValues.put("link", row.get("link"));
             contentValues.put("description", row.get("description"));
+            contentValues.put("author", row.get("author"));
             db.insert(table, null, contentValues);
         }
         db.close();
@@ -128,6 +129,7 @@ public class Database extends SQLiteOpenHelper {
             row.put("path", cursor.getString(7));
             row.put("link", cursor.getString(8));
             row.put("description", cursor.getString(9));
+            row.put("author", cursor.getString(10));
             rows.add(row);
         }
         cursor.close();
@@ -158,6 +160,7 @@ public class Database extends SQLiteOpenHelper {
             row.put("path", cursor.getString(7));
             row.put("link", cursor.getString(8));
             row.put("description", cursor.getString(9));
+            row.put("author", cursor.getString(10));
             rows.add(row);
         }
         cursor.close();
@@ -185,7 +188,8 @@ public class Database extends SQLiteOpenHelper {
                     cursor.getString(6) + " | " +
                     cursor.getString(7) + " | " +
                     cursor.getString(8) + " | " +
-                    cursor.getString(9) + "\n";
+                    cursor.getString(9) + " | " +
+                    cursor.getString(10) + "\n";
         }
         cursor.close();
         db.close();
@@ -214,6 +218,7 @@ public class Database extends SQLiteOpenHelper {
         row.put("path", cursor.getString(7));
         row.put("link", cursor.getString(8));
         row.put("description", cursor.getString(9));
+        row.put("author", cursor.getString(10));
         cursor.close();
         db.close();
         return row;
@@ -241,6 +246,7 @@ public class Database extends SQLiteOpenHelper {
             row.put("path", cursor.getString(7));
             row.put("link", cursor.getString(8));
             row.put("description", cursor.getString(9));
+            row.put("author", cursor.getString(10));
             rows.add(row);
         }
         cursor.close();

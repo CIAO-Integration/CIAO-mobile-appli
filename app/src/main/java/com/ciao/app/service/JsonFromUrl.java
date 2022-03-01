@@ -55,11 +55,13 @@ public class JsonFromUrl extends Service implements Runnable {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        arguments = (Map<String, String>) intent.getSerializableExtra("arguments");
-        target = intent.getStringExtra("target");
-        url = intent.getStringExtra("url");
-        Thread thread = new Thread(this);
-        thread.start();
+        if (intent != null) {
+            arguments = (Map<String, String>) intent.getSerializableExtra("arguments");
+            target = intent.getStringExtra("target");
+            url = intent.getStringExtra("url");
+            Thread thread = new Thread(this);
+            thread.start();
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 

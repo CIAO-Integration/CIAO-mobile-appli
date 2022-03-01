@@ -211,6 +211,7 @@ public class Settings extends AppCompatActivity {
                                     arguments.put("key", sharedPreferences.getString("key", null));
                                     Intent intent = new Intent(context, JsonFromUrl.class);
                                     intent.putExtra("arguments", (Serializable) arguments);
+                                    intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
                                     context.startService(intent);
                                 }
                             }
@@ -326,7 +327,7 @@ public class Settings extends AppCompatActivity {
                     intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
                     context.startService(intent);
 
-                    startActivity(new Intent(getContext(), Loading.class));
+                    startActivity(new Intent(getContext(), Main.class));
                     getActivity().finishAffinity();
                     return false;
                 }
@@ -396,12 +397,12 @@ public class Settings extends AppCompatActivity {
                             context.unregisterReceiver(gpsReceiver);
                             progressDialog.cancel();
                             loading = false;
-                            Functions.makeErrorDialog(context, getString(R.string.error_retry)).show();
+                            Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_retry)).show();
                         }
                     }
                 }, 10000);
             } else {
-                Functions.makeErrorDialog(context, getString(R.string.error_network)).show();
+                Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_network)).show();
             }
         }
 
@@ -440,12 +441,12 @@ public class Settings extends AppCompatActivity {
                         context.startService(intent1);
                     } catch (IOException e) {
                         e.printStackTrace();
-                        Functions.makeErrorDialog(context, e.toString()).show();
+                        Functions.makeDialog(context, getString(R.string.error), e.toString()).show();
                     }
                     progressDialog.cancel();
                 } else {
                     progressDialog.cancel();
-                    Functions.makeErrorDialog(context, getString(R.string.error_gps)).show();
+                    Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_gps)).show();
                 }
             }
         }

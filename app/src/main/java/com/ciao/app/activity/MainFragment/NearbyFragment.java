@@ -15,7 +15,7 @@ import com.ciao.app.databinding.FragmentMainBinding;
 /**
  * Around category Fragment
  */
-public class AroundFragment extends Fragment {
+public class NearbyFragment extends Fragment {
     /**
      * Binding to get Views
      */
@@ -31,9 +31,16 @@ public class AroundFragment extends Fragment {
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentMainBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-        Functions.initFragment(getContext(), binding, R.string.around);
-        return root;
+        return binding.getRoot();
+    }
+
+    /**
+     * On resume, update nearby production list
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        Functions.initFragment(getContext(), binding, R.string.nearby);
     }
 
     /**

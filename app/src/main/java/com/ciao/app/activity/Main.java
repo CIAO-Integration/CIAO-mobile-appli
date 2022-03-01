@@ -47,6 +47,7 @@ import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.ciao.app.service.JsonFromUrl;
+import com.ciao.app.view.Tag;
 import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONArray;
@@ -89,6 +90,10 @@ public class Main extends AppCompatActivity {
      * Filename
      */
     private String name;
+    /**
+     * Current fragment
+     */
+    private String current;
 
     /**
      * Create Activity
@@ -112,44 +117,43 @@ public class Main extends AppCompatActivity {
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
-                String text = null;
                 switch (destination.getId()) {
                     case R.id.nav_browse:
-                        text = getString(R.string.browse);
+                        current = getString(R.string.browse);
                         break;
-                    case R.id.nav_around:
-                        text = getString(R.string.around);
+                    case R.id.nav_nearby:
+                        current = getString(R.string.nearby);
                         break;
                     case R.id.nav_news:
-                        text = getString(R.string.news);
+                        current = getString(R.string.news);
                         break;
                     case R.id.nav_popularization:
-                        text = getString(R.string.popularization);
+                        current = getString(R.string.popularization);
                         break;
                     case R.id.nav_digital:
-                        text = getString(R.string.digital);
+                        current = getString(R.string.digital);
                         break;
                     case R.id.nav_science:
-                        text = getString(R.string.science);
+                        current = getString(R.string.science);
                         break;
                     case R.id.nav_culture:
-                        text = getString(R.string.culture);
+                        current = getString(R.string.culture);
                         break;
                     case R.id.nav_history:
-                        text = getString(R.string.history);
+                        current = getString(R.string.history);
                         break;
                     case R.id.nav_geography:
-                        text = getString(R.string.geography);
+                        current = getString(R.string.geography);
                         break;
                     case R.id.nav_politics:
-                        text = getString(R.string.politics);
+                        current = getString(R.string.politics);
                         break;
                     case R.id.nav_sport:
-                        text = getString(R.string.sport);
+                        current = getString(R.string.sport);
                         break;
                 }
                 TextView title = findViewById(R.id.actionbar_title);
-                title.setText(text);
+                title.setText(current);
             }
         });
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -177,7 +181,7 @@ public class Main extends AppCompatActivity {
                 Drawable placeholder = AppCompatResources.getDrawable(this, R.drawable.no_avatar);
                 Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
             }
-            Functions.initNotifications(this);
+            Functions.initNotifications(this, true);
         }
 
         searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -195,12 +199,18 @@ public class Main extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (key != null) {
-            Menu menu = navigationView.getMenu();
-            if (sharedPreferences.getBoolean("location_mode", false) && sharedPreferences.getString("location", null) != null) {
-                menu.findItem(R.id.nav_around).setVisible(true);
-            } else {
-                menu.findItem(R.id.nav_around).setVisible(false);
+        Menu menu = navigationView.getMenu();
+        if (key != null && sharedPreferences.getBoolean("location_mode", false) && sharedPreferences.getString("location", null) != null) {
+            menu.findItem(R.id.nav_nearby).setVisible(true);
+        } else {
+            menu.findItem(R.id.nav_nearby).setVisible(false);
+        }
+
+        if (key != null && !current.equals(getString(R.string.browse)) && !current.equals(getString(R.string.nearby))) {
+            LinearLayout linearLayout = findViewById(R.id.main_placeholder);
+            if (linearLayout.getChildCount() == 1) {
+                Tag tag = (Tag) linearLayout.getChildAt(0);
+                tag.update();
             }
         }
     }
@@ -311,7 +321,7 @@ public class Main extends AppCompatActivity {
                         intent.putExtra("productionId", productionId);
                         context.startActivity(intent);
                     } else {
-                        Functions.makeErrorDialog(context, context.getString(R.string.error_network)).show();
+                        Functions.makeDialog(context, context.getString(R.string.error), context.getString(R.string.error_network)).show();
                     }
                 }
             });
@@ -472,7 +482,7 @@ public class Main extends AppCompatActivity {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Functions.makeErrorDialog(context, e.toString()).show();
+                    Functions.makeDialog(context, context.getString(R.string.error), e.toString()).show();
                 }
             }
         }

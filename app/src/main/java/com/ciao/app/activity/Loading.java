@@ -82,7 +82,7 @@ public class Loading extends AppCompatActivity {
                     Functions.refreshTimeline(this, new TimelineReceiver(), TIMELINE_TARGET);
                 }
             } else {
-                Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
+                Functions.makeDialog(this, getString(R.string.error), getString(R.string.error_network)).show();
             }
         }
     }
@@ -110,11 +110,11 @@ public class Loading extends AppCompatActivity {
                         startActivity(new Intent(context, Main.class));
                         finish();
                     } else {
-                        Functions.makeErrorDialog(context, getString(R.string.error_message, status, json.getString("message"))).show();
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_message, status, json.getString("message"))).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Functions.makeErrorDialog(context, e.toString()).show();
+                    Functions.makeDialog(context, getString(R.string.error), e.toString()).show();
                 }
             }
         }
@@ -167,12 +167,12 @@ public class Loading extends AppCompatActivity {
                         editor.remove("location_mode");
                         editor.remove("locations");
                     } else {
-                        Functions.makeErrorDialog(context, getString(R.string.error_message, status, json.getString("message"))).show();
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_message, status, json.getString("message"))).show();
                     }
                     editor.apply();
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Functions.makeErrorDialog(context, e.toString()).show();
+                    Functions.makeDialog(context, getString(R.string.error), e.toString()).show();
                 }
             }
             Functions.refreshTimeline(context, new TimelineReceiver(), TIMELINE_TARGET);

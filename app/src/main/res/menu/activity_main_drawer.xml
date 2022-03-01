@@ -8,8 +8,8 @@
             android:id="@+id/nav_browse"
             android:title="@string/browse" />
         <item
-            android:id="@+id/nav_around"
-            android:title="@string/around" />
+            android:id="@+id/nav_nearby"
+            android:title="@string/nearby" />
         <item
             android:id="@+id/nav_news"
             android:title="@string/news" />

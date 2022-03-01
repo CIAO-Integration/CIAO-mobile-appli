@@ -23,7 +23,6 @@ import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.ciao.app.service.JsonFromUrl;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -243,7 +242,7 @@ public class Login extends AppCompatActivity {
             progressDialog = Functions.makeLoadingDialog(this);
             progressDialog.show();
         } else {
-            Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
+            Functions.makeDialog(this, getString(R.string.error), getString(R.string.error_network)).show();
         }
     }
 
@@ -255,13 +254,13 @@ public class Login extends AppCompatActivity {
     public void register(View view) {
         if (Functions.checkConnection(this)) {
             if (!registerUsernameValid) {
-                Functions.makeErrorDialog(this, getString(R.string.not_valid_username)).show();
+                Functions.makeDialog(this, getString(R.string.error), getString(R.string.not_valid_username)).show();
             } else if (!registerEmailValid) {
-                Functions.makeErrorDialog(this, getString(R.string.not_valid_email)).show();
+                Functions.makeDialog(this, getString(R.string.error), getString(R.string.not_valid_email)).show();
             } else if (!registerPasswordValid) {
-                Functions.makeErrorDialog(this, getString(R.string.not_valid_password)).show();
+                Functions.makeDialog(this, getString(R.string.error), getString(R.string.not_valid_password)).show();
             } else if (!registerConfPasswordValid) {
-                Functions.makeErrorDialog(this, getString(R.string.not_valid_conf_password)).show();
+                Functions.makeDialog(this, getString(R.string.error), getString(R.string.not_valid_conf_password)).show();
             } else {
                 String username = registerUsername.getText().toString();
                 String email = registerEmail.getText().toString();
@@ -285,7 +284,7 @@ public class Login extends AppCompatActivity {
                 progressDialog.show();
             }
         } else {
-            Functions.makeErrorDialog(this, getString(R.string.error_network)).show();
+            Functions.makeDialog(this, getString(R.string.error), getString(R.string.error_network)).show();
         }
     }
 
@@ -352,17 +351,18 @@ public class Login extends AppCompatActivity {
                         editor.apply();
                         next();
                     } else if (status.equals("500")) {
-                        Snackbar.make(findViewById(android.R.id.content), getString(R.string.server_error), Snackbar.LENGTH_SHORT).show();
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.server_error)).show();
                     } else if (status.equals("406")) {
-                        Snackbar.make(findViewById(android.R.id.content), getString(R.string.wrong_password), Snackbar.LENGTH_SHORT).show();
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.wrong_password)).show();
                     } else if (status.equals("404")) {
-                        Snackbar.make(findViewById(android.R.id.content), getString(R.string.user_not_found), Snackbar.LENGTH_SHORT).show();
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.user_not_found)).show();
+
                     } else {
-                        Functions.makeErrorDialog(context, getString(R.string.error_message, status, json.getString("message"))).show();
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_message, status, json.getString("message"))).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Functions.makeErrorDialog(context, e.toString()).show();
+                    Functions.makeDialog(context, getString(R.string.error), e.toString()).show();
                 }
             }
         }
@@ -387,19 +387,19 @@ public class Login extends AppCompatActivity {
                     JSONObject json = new JSONObject(intent.getStringExtra("json"));
                     String status = json.getString("status");
                     if (status.equals("200")) {
-                        Snackbar.make(findViewById(android.R.id.content), getString(R.string.check_email), Snackbar.LENGTH_SHORT).show();
+                        Functions.makeDialog(context, getString(R.string.succes), getString(R.string.check_email)).show();
                     } else if (status.equals("500")) {
-                        Snackbar.make(findViewById(android.R.id.content), getString(R.string.server_error), Snackbar.LENGTH_SHORT).show();
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.server_error)).show();
                     } else if (status.equals("406")) {
-                        Snackbar.make(findViewById(android.R.id.content), getString(R.string.invalid_username_email), Snackbar.LENGTH_SHORT).show();
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.invalid_username_email)).show();
                     } else if (status.equals("401")) {
-                        Snackbar.make(findViewById(android.R.id.content), getString(R.string.user_exists), Snackbar.LENGTH_SHORT).show();
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.user_exists)).show();
                     } else {
-                        Functions.makeErrorDialog(context, getString(R.string.error_message, status, json.getString("message"))).show();
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_message, status, json.getString("message"))).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Functions.makeErrorDialog(context, e.toString()).show();
+                    Functions.makeDialog(context, getString(R.string.error), e.toString()).show();
                 }
             }
         }

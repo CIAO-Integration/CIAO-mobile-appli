@@ -81,11 +81,11 @@ public class RefreshReceiver extends BroadcastReceiver {
                     database.close();
                     recyclerView.setAdapter(recyclerViewAdapter);
                 } else {
-                    Functions.makeErrorDialog(context, context.getString(R.string.error_message, status, json.getString("message"))).show();
+                    Functions.makeDialog(context, context.getString(R.string.error), context.getString(R.string.error_message, status, json.getString("message"))).show();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
-                Functions.makeErrorDialog(context, e.toString()).show();
+                Functions.makeDialog(context, context.getString(R.string.error), e.toString()).show();
             }
         }
         swipeRefreshLayout.setRefreshing(false);

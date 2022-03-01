@@ -80,6 +80,10 @@ public class Production extends AppCompatActivity {
      * Tags
      */
     private String tags;
+    /**
+     * Author
+     */
+    private String author;
 
     /**
      * Create Activity
@@ -138,6 +142,7 @@ public class Production extends AppCompatActivity {
         type = row.get("type");
         link = row.get("link");
         tags = row.get("tags");
+        author = row.get("author");
         TextView actionBarTitle = findViewById(R.id.actionbar_title);
         TextView productionTitle = findViewById(R.id.production_title);
         productionTitle.setText(row.get("title"));
@@ -153,7 +158,7 @@ public class Production extends AppCompatActivity {
                 startService(intent1);
             } else {
                 progressDialog.cancel();
-                Functions.makeErrorDialog(this, getString(R.string.error_article)).show();
+                Functions.makeDialog(this, getString(R.string.error), getString(R.string.error_article)).show();
             }
         } else if (type.equals("video")) {
             actionBarTitle.setText(getString(R.string.video));
@@ -180,15 +185,15 @@ public class Production extends AppCompatActivity {
                         if (!prepared) {
                             progressDialog.cancel();
                             videoView.suspend();
-                            Functions.makeErrorDialog(Production.this, getString(R.string.error_video)).show();
+                            Functions.makeDialog(Production.this, getString(R.string.error), getString(R.string.error_video)).show();
                         }
                     }
                 }, 5000);
             } else {
                 progressDialog.cancel();
-                Functions.makeErrorDialog(Production.this, getString(R.string.error_video)).show();
+                Functions.makeDialog(Production.this, getString(R.string.error), getString(R.string.error_video)).show();
             }
-            ArticleBuilder articleBuilder = new ArticleBuilder(Production.this, content, "<p>" + row.get("description") + "</p>", tags);
+            ArticleBuilder articleBuilder = new ArticleBuilder(Production.this, content, "<p>" + row.get("description") + "</p>", tags, author);
             articleBuilder.build();
         }
 
@@ -266,9 +271,9 @@ public class Production extends AppCompatActivity {
             String text = intent.getStringExtra("text");
             if (text == null) {
                 progressDialog.cancel();
-                Functions.makeErrorDialog(context, getString(R.string.error_article)).show();
+                Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_article)).show();
             } else {
-                ArticleBuilder articleBuilder = new ArticleBuilder(context, content, text, tags);
+                ArticleBuilder articleBuilder = new ArticleBuilder(context, content, text, tags, author);
                 articleBuilder.build();
                 progressDialog.cancel();
             }

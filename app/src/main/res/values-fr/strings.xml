@@ -11,7 +11,7 @@
     <string name="politics">Politique</string>
     <string name="sport">Sport</string>
     <string name="browse">Parcourir</string>
-    <string name="around">Autour de vous</string>
+    <string name="nearby">Autour de vous</string>
     <string name="theme">Thème</string>
     <string name="system">Système</string>
     <string name="light">Clair</string>
@@ -44,7 +44,7 @@
     <string name="set_location">Définir localisation</string>
     <string name="undefined">Non défini</string>
     <string name="server_error">Erreur serveur</string>
-    <string name="check_email">Succès ! Veuillez vérifier votre boîte mail pour valider votre compte</string>
+    <string name="check_email">Veuillez vérifier votre boîte mail pour valider votre compte</string>
     <string name="wrong_password">Mot de passe erroné</string>
     <string name="user_not_found">Utilisateur introuvable</string>
     <string name="user_exists">Utilisateur existe déjà</string>
@@ -83,4 +83,6 @@
     <string name="notifications_description">Vous notifie lorsqu\'une nouvelle production correspondante à vos centres d\'intérêt sort</string>
     <string name="new_production">Une nouvelle production est sortie</string>
     <string name="tag_checked">✔</string>
+    <string name="author">Auteur : %1$s</string>
+    <string name="succes">Succès</string>
 </resources>

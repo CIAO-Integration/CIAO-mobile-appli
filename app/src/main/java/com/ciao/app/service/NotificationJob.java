@@ -40,7 +40,7 @@ public class NotificationJob extends JobService {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if (sharedPreferences.getString("key", null) != null) {
             Functions.refreshTimeline(getApplicationContext(), new TimelineReceiver(), "Notifications");
-            Functions.initNotifications(getApplicationContext());
+            Functions.initNotifications(getApplicationContext(), false);
         }
         return true;
     }

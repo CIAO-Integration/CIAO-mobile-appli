@@ -29,8 +29,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.preference.PreferenceManager;
@@ -81,7 +79,7 @@ public class Functions {
         switch (which) {
             case R.string.browse:
                 break;
-            case R.string.around:
+            case R.string.nearby:
                 location = sharedPreferences.getString("location", null);
                 break;
             case R.string.news:
@@ -196,21 +194,9 @@ public class Functions {
             }
         });
 
-        if (sharedPreferences.getString("key", null) != null && which != R.string.browse && which != R.string.around) {
-            int verticalMargin = (int) context.getResources().getDimension(R.dimen.activity_vertical_margin);
-            int horizontalMargin = (int) context.getResources().getDimension(R.dimen.activity_horizontal_margin);
-
-            ConstraintLayout constraintLayout = binding.mainActionBar;
-            Tag tag = new Tag(context, filter);
-            tag.setId(View.generateViewId());
-            constraintLayout.addView(tag);
-
-            ConstraintSet constraintSet = new ConstraintSet();
-            constraintSet.clone(constraintLayout);
-            constraintSet.connect(tag.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, horizontalMargin);
-            constraintSet.connect(tag.getId(), ConstraintSet.BOTTOM, constraintLayout.getId(), ConstraintSet.BOTTOM, verticalMargin);
-            constraintSet.connect(tag.getId(), ConstraintSet.TOP, constraintLayout.getId(), ConstraintSet.TOP, verticalMargin);
-            constraintSet.applyTo(constraintLayout);
+        if (sharedPreferences.getString("key", null) != null && which != R.string.browse && which != R.string.nearby) {
+            LinearLayout linearLayout = binding.mainPlaceholder;
+            linearLayout.addView(new Tag(context, filter));
         }
     }
 
@@ -258,6 +244,7 @@ public class Functions {
             row.put("path", item.getString("path"));
             row.put("link", item.getString("link"));
             row.put("description", item.getString("description"));
+            row.put("author", item.getString("author"));
             rows.add(row);
         }
         Database database = new Database(context);
@@ -304,9 +291,9 @@ public class Functions {
      * @param message Message
      * @return Loading dialog
      */
-    public static Dialog makeErrorDialog(Context context, String message) {
+    public static Dialog makeDialog(Context context, String title, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getString(R.string.error));
+        builder.setTitle(title);
         builder.setMessage(message);
         builder.setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
@@ -403,8 +390,9 @@ public class Functions {
      * Initiate notification system
      *
      * @param context Context
+     * @param init    First start
      */
-    public static void initNotifications(Context context) {
+    public static void initNotifications(Context context, boolean init) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getString("key", null) != null) {
             JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
             boolean found = false;
@@ -420,8 +408,13 @@ public class Functions {
                 createNotificationChannel(context);
                 ComponentName componentName = new ComponentName(context, NotificationJob.class);
                 JobInfo.Builder builder = new JobInfo.Builder(0, componentName);
-                builder.setMinimumLatency(1000 * 60 * 55);
-                builder.setOverrideDeadline(1000 * 60 * 65);
+                if (init) {
+                    builder.setMinimumLatency(0);
+                    builder.setOverrideDeadline(1000 * 60 * 3);
+                } else {
+                    builder.setMinimumLatency(1000 * 60 * 55);
+                    builder.setOverrideDeadline(1000 * 60 * 65);
+                }
                 builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
                 builder.setRequiresCharging(false);
                 builder.setRequiresDeviceIdle(false);
