@@ -31,7 +31,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
@@ -353,7 +352,7 @@ public class Main extends AppCompatActivity {
             /**
              * Card
              */
-            private final CardView card;
+            private final LinearLayout card;
             /**
              * Image of item
              */

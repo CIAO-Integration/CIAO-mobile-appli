@@ -387,7 +387,7 @@ public class Login extends AppCompatActivity {
                     JSONObject json = new JSONObject(intent.getStringExtra("json"));
                     String status = json.getString("status");
                     if (status.equals("200")) {
-                        Functions.makeDialog(context, getString(R.string.succes), getString(R.string.check_email)).show();
+                        Functions.makeDialog(context, getString(R.string.success), getString(R.string.check_email)).show();
                     } else if (status.equals("500")) {
                         Functions.makeDialog(context, getString(R.string.error), getString(R.string.server_error)).show();
                     } else if (status.equals("406")) {

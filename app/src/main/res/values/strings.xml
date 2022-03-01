@@ -84,5 +84,5 @@
     <string name="new_production">A new production is out</string>
     <string name="tag_checked">✔</string>
     <string name="author">Author : %1$s</string>
-    <string name="succes">Success</string>
+    <string name="success">Success</string>
 </resources>
