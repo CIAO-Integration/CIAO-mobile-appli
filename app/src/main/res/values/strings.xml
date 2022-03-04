@@ -80,9 +80,10 @@
     <string name="update_message">Do you want to update ?\n\nVersion : %1$s\nChangelog :\n%2$s</string>
     <string name="notifications_restored">Restored notifications</string>
     <string name="notifications">Notifications</string>
-    <string name="notifications_description">Notifies you when a new production matching your centers of interrest is released</string>
+    <string name="notifications_description">Notifies you when a new production matching your centers of interest is released</string>
     <string name="new_production">A new production is out</string>
     <string name="tag_checked">✔</string>
     <string name="author">Author : %1$s</string>
     <string name="success">Success</string>
+    <string name="authors_summary">GitHub :<b>\n@ChrisB822\n@Klbgr\n@oanikienko\n@Viklaj</b></string>
 </resources>

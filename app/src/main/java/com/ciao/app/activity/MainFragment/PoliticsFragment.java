@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.ciao.app.Functions;
@@ -32,7 +33,7 @@ public class PoliticsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentMainBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        Functions.initFragment(getContext(), binding, R.string.politics);
+        Functions.initFragment((AppCompatActivity) getActivity(), binding, R.string.politics);
         return root;
     }
 

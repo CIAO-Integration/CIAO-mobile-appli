@@ -21,6 +21,7 @@
         <item name="alertDialogTheme">@style/Theme.CIAO.AlertDialog</item>
         <item name="editTextStyle">@style/Theme.CIAO.EditText</item>
         <item name="android:colorBackground">@color/blue</item>
+        <item name="android:windowActivityTransitions">true</item>
     </style>
 
     <style name="Theme.CIAO.TextView" parent="android:Widget.TextView">

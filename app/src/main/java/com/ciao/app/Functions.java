@@ -28,6 +28,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -64,16 +65,16 @@ public class Functions {
     /**
      * Init a Fragment of Main Activity
      *
-     * @param context Context
-     * @param binding Binding to get Views
-     * @param which   Which Fragment
+     * @param activity Activity
+     * @param binding  Binding to get Views
+     * @param which    Which Fragment
      */
-    public static void initFragment(Context context, FragmentMainBinding binding, int which) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    public static void initFragment(AppCompatActivity activity, FragmentMainBinding binding, int which) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
         Spinner spinner = binding.mainSort;
         RecyclerView recyclerView = binding.mainList;
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        Database database = new Database(context);
+        recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+        Database database = new Database(activity);
         String filter = null;
         String location = null;
         switch (which) {
@@ -112,7 +113,7 @@ public class Functions {
         }
         ArrayList<HashMap<String, String>> data = database.getRowsByFilter(filter, location);
         database.close();
-        Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(context, data);
+        Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(activity, data);
         recyclerView.setAdapter(recyclerViewAdapter);
         SwipeRefreshLayout swipeRefreshLayout = binding.mainRefresh;
         String finalFilter = filter;
@@ -120,11 +121,11 @@ public class Functions {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshTimeline(context, new RefreshReceiver(finalFilter, finalLocation, recyclerView, swipeRefreshLayout, spinner), "Refresh");
+                refreshTimeline(activity, new RefreshReceiver(finalFilter, finalLocation, recyclerView, swipeRefreshLayout, spinner, activity), "Refresh");
             }
         });
 
-        spinner.setAdapter(ArrayAdapter.createFromResource(context, R.array.sort, android.R.layout.simple_spinner_item));
+        spinner.setAdapter(ArrayAdapter.createFromResource(activity, R.array.sort, android.R.layout.simple_spinner_item));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -186,7 +187,7 @@ public class Functions {
                         });
                         break;
                 }
-                recyclerView.setAdapter(new Main.RecyclerViewAdapter(context, data));
+                recyclerView.setAdapter(new Main.RecyclerViewAdapter(activity, data));
             }
 
             @Override
@@ -196,30 +197,26 @@ public class Functions {
 
         if (sharedPreferences.getString("key", null) != null && which != R.string.browse && which != R.string.nearby) {
             LinearLayout linearLayout = binding.mainPlaceholder;
-            linearLayout.addView(new Tag(context, filter));
+            linearLayout.addView(new Tag(activity, filter));
         }
     }
 
     /**
      * Get data to populate timeline
      *
-     * @param context           Context
+     * @param activity          Activity
      * @param broadcastReceiver Broadcast receiver
      * @param target            Target
      */
-    public static void refreshTimeline(Context context, BroadcastReceiver broadcastReceiver, String target) {
+    public static void refreshTimeline(AppCompatActivity activity, BroadcastReceiver broadcastReceiver, String target) {
         Map<String, String> arguments = new HashMap();
         arguments.put("request", "timeline");
-        context.registerReceiver(broadcastReceiver, new IntentFilter(target));
-        Intent intent = new Intent(context, JsonFromUrl.class);
+        activity.registerReceiver(broadcastReceiver, new IntentFilter(target));
+        Intent intent = new Intent(activity, JsonFromUrl.class);
         intent.putExtra("arguments", (Serializable) arguments);
         intent.putExtra("target", target);
         intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent);
-        } else {
-            context.startService(intent);
-        }
+        activity.startService(intent);
     }
 
     /**

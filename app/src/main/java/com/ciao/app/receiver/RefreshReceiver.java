@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Spinner;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -42,6 +43,10 @@ public class RefreshReceiver extends BroadcastReceiver {
      * Spinner
      */
     private final Spinner spinner;
+    /**
+     * Activity
+     */
+    private final AppCompatActivity activity;
 
     /**
      * Constructor
@@ -51,13 +56,15 @@ public class RefreshReceiver extends BroadcastReceiver {
      * @param recyclerView       RecyclerView
      * @param swipeRefreshLayout SwiperRefreshLayout
      * @param spinner            Spinner
+     * @param activity           Activity
      */
-    public RefreshReceiver(String filter, String location, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout, Spinner spinner) {
+    public RefreshReceiver(String filter, String location, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout, Spinner spinner, AppCompatActivity activity) {
         this.filter = filter;
         this.location = location;
         this.recyclerView = recyclerView;
         this.swipeRefreshLayout = swipeRefreshLayout;
         this.spinner = spinner;
+        this.activity = activity;
     }
 
     /**
@@ -77,7 +84,7 @@ public class RefreshReceiver extends BroadcastReceiver {
                     JSONArray array = json.getJSONArray("list");
                     Functions.storeTimeline(context, array, Database.TABLE_NAME);
                     Database database = new Database(context);
-                    Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(context, database.getRowsByFilter(filter, location));
+                    Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(activity, database.getRowsByFilter(filter, location));
                     database.close();
                     recyclerView.setAdapter(recyclerViewAdapter);
                 } else {

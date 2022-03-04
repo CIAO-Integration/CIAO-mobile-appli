@@ -67,7 +67,7 @@ public class Search extends AppCompatActivity {
         database.close();
 
         RecyclerView recyclerView = findViewById(R.id.main_list);
-        Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(this, data);
+        Main.RecyclerViewAdapter recyclerViewAdapter = new Main.RecyclerViewAdapter(Search.this, data);
         recyclerView.setAdapter(recyclerViewAdapter);
     }
 }

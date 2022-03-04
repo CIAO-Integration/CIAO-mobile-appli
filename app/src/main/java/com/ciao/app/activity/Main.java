@@ -1,6 +1,7 @@
 package com.ciao.app.activity;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -14,12 +15,14 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -233,7 +236,8 @@ public class Main extends AppCompatActivity {
      * Start Settings Activity
      */
     public void settings() {
-        startActivity(new Intent(this, Settings.class));
+        ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(Main.this, new Pair<>(findViewById(R.id.actionbar_cardview), "avatar"));
+        startActivity(new Intent(this, Settings.class), activityOptions.toBundle());
     }
 
     /**
@@ -252,22 +256,26 @@ public class Main extends AppCompatActivity {
      */
     public static class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
         /**
-         * Context
+         * Activity
          */
-        private final Context context;
+        private final AppCompatActivity activity;
         /**
          * Data
          */
         private final ArrayList<HashMap<String, String>> data;
+        /**
+         * Last position
+         */
+        private int lastPosition = -1;
 
         /**
          * Constructor
          *
-         * @param context Context
-         * @param data    Data
+         * @param activity Activity
+         * @param data     Data
          */
-        public RecyclerViewAdapter(Context context, ArrayList<HashMap<String, String>> data) {
-            this.context = context;
+        public RecyclerViewAdapter(AppCompatActivity activity, ArrayList<HashMap<String, String>> data) {
+            this.activity = activity;
             this.data = data;
         }
 
@@ -293,33 +301,38 @@ public class Main extends AppCompatActivity {
          * @param position Position
          */
         @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
             holder.title.setText(data.get(position).get("title"));
             if (data.get(position).get("thumbnail") != null) {
                 String source = data.get(position).get("thumbnail");
                 if (!source.startsWith("http")) {
                     source = BuildConfig.STORAGE_SERVER_URL + source;
                 }
-                Drawable placeholder = AppCompatResources.getDrawable(context, R.drawable.no_image);
-                Glide.with(context).load(source).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.image);
+                Drawable placeholder = AppCompatResources.getDrawable(activity, R.drawable.no_image);
+                Glide.with(activity).load(source).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.image);
             }
             if (data.get(position).get("type").equals("video")) {
-                holder.image.setForeground(AppCompatResources.getDrawable(context, android.R.drawable.ic_media_play));
+                holder.image.setForeground(AppCompatResources.getDrawable(activity, android.R.drawable.ic_media_play));
             }
             String productionId = data.get(position).get("id");
             holder.card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    boolean connected = Functions.checkConnection(context);
+                    boolean connected = Functions.checkConnection(activity);
                     if (connected) {
-                        Intent intent = new Intent(context, Production.class);
+                        Intent intent = new Intent(activity, Production.class);
                         intent.putExtra("productionId", productionId);
-                        context.startActivity(intent);
+                        ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(activity, new Pair<>(holder.title, "title"));
+                        activity.startActivity(intent, activityOptions.toBundle());
                     } else {
-                        Functions.makeDialog(context, context.getString(R.string.error), context.getString(R.string.error_network)).show();
+                        Functions.makeDialog(activity, activity.getString(R.string.error), activity.getString(R.string.error_network)).show();
                     }
                 }
             });
+            if (position > lastPosition) {
+                holder.card.startAnimation(AnimationUtils.loadAnimation(activity, R.anim.item_animation));
+                lastPosition = position;
+            }
         }
 
         /**

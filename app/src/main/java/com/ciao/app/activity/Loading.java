@@ -1,11 +1,13 @@
 package com.ciao.app.activity;
 
+import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Pair;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -107,7 +109,8 @@ public class Loading extends AppCompatActivity {
                     if (status.equals("200")) {
                         JSONArray array = json.getJSONArray("list");
                         Functions.storeTimeline(context, array, Database.TABLE_NAME);
-                        startActivity(new Intent(context, Main.class));
+                        ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(Loading.this, new Pair<>(findViewById(R.id.loading_logo), "logo"));
+                        startActivity(new Intent(context, Main.class), activityOptions.toBundle());
                         finish();
                     } else {
                         Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_message, status, json.getString("message"))).show();
@@ -175,7 +178,7 @@ public class Loading extends AppCompatActivity {
                     Functions.makeDialog(context, getString(R.string.error), e.toString()).show();
                 }
             }
-            Functions.refreshTimeline(context, new TimelineReceiver(), TIMELINE_TARGET);
+            Functions.refreshTimeline(Loading.this, new TimelineReceiver(), TIMELINE_TARGET);
         }
     }
 }

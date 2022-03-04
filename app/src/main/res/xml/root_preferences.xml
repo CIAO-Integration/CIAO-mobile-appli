@@ -45,7 +45,7 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="authors"
-            app:summary="Team CIAO"
+            app:summary="@string/authors_summary"
             app:title="@string/authors" />
         <Preference
             app:iconSpaceReserved="false"
@@ -55,7 +55,7 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="version"
-            app:summary="1.0"
+            app:summary=""
             app:title="@string/version" />
     </PreferenceCategory>
 </PreferenceScreen>

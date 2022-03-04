@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.ciao.app.Functions;
@@ -40,7 +41,7 @@ public class NearbyFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Functions.initFragment(getContext(), binding, R.string.nearby);
+        Functions.initFragment((AppCompatActivity) getActivity(), binding, R.string.nearby);
     }
 
     /**

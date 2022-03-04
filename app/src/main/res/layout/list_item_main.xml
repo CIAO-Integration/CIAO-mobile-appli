@@ -32,6 +32,7 @@
         android:layout_margin="8dp"
         android:gravity="center"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:transitionName="title" />
 
 </LinearLayout>
