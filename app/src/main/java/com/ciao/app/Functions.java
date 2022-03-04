@@ -256,10 +256,10 @@ public class Functions {
     /**
      * Set app theme
      *
-     * @param theme Theme
+     * @param context Context
      */
-    public static void setTheme(String theme) {
-        switch (theme) {
+    public static void setTheme(Context context) {
+        switch (PreferenceManager.getDefaultSharedPreferences(context).getString("theme", "light")) {
             case "system":
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 break;
@@ -390,9 +390,8 @@ public class Functions {
      * Initiate notification system
      *
      * @param context Context
-     * @param init    First start
      */
-    public static void initNotifications(Context context, boolean init) {
+    public static void initNotifications(Context context) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getString("key", null) != null) {
             JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
             boolean found = false;
@@ -408,16 +407,11 @@ public class Functions {
                 createNotificationChannel(context);
                 ComponentName componentName = new ComponentName(context, NotificationJob.class);
                 JobInfo.Builder builder = new JobInfo.Builder(0, componentName);
-                if (init) {
-                    builder.setMinimumLatency(0);
-                    builder.setOverrideDeadline(1000 * 60 * 3);
-                } else {
-                    builder.setMinimumLatency(1000 * 60 * 55);
-                    builder.setOverrideDeadline(1000 * 60 * 65);
-                }
+                builder.setPeriodic(1000 * 60 * 60);
                 builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
                 builder.setRequiresCharging(false);
                 builder.setRequiresDeviceIdle(false);
+                builder.setPersisted(true);
                 jobScheduler.schedule(builder.build());
             }
         }
@@ -449,6 +443,7 @@ public class Functions {
         Intent intent = new Intent(context, Production.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra("productionId", productionId);
+        intent.putExtra("external", true);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) (Math.random() * 1000), intent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "CIAO")
                 .setSmallIcon(R.mipmap.ic_launcher)

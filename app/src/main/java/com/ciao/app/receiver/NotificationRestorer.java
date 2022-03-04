@@ -23,7 +23,7 @@ public class NotificationRestorer extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getString("key", null) != null) {
-            Functions.initNotifications(context, true);
+            Functions.initNotifications(context);
             Toast.makeText(context, context.getString(R.string.notifications_restored), Toast.LENGTH_SHORT).show();
         }
     }

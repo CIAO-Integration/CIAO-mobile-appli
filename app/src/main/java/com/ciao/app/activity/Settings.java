@@ -193,7 +193,7 @@ public class Settings extends AppCompatActivity {
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                     switch (key) {
                         case "theme":
-                            Functions.setTheme(sharedPreferences.getString(key, "light"));
+                            Functions.setTheme(context);
                             break;
                         case "location_mode":
                             boolean location_mode = sharedPreferences.getBoolean("location_mode", false);

@@ -58,7 +58,7 @@ public class Loading extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sharedPreferences.edit();
 
-        Functions.setTheme(sharedPreferences.getString("theme", "light"));
+        Functions.setTheme(this);
 
         if (sharedPreferences.getBoolean("firstTime", true)) {
             startActivity(new Intent(this, Login.class));

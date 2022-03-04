@@ -92,6 +92,12 @@ public class Production extends AppCompatActivity {
      */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Intent intent = getIntent();
+
+        if (intent.getBooleanExtra("external", false)) {
+            Functions.setTheme(this);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_production);
 
@@ -136,7 +142,7 @@ public class Production extends AppCompatActivity {
         progressDialog.show();
 
         Database database = new Database(this);
-        HashMap<String, String> row = database.getRowById(getIntent().getStringExtra("productionId"));
+        HashMap<String, String> row = database.getRowById(intent.getStringExtra("productionId"));
         database.close();
 
         type = row.get("type");

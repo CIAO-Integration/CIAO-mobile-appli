@@ -180,7 +180,7 @@ public class Main extends AppCompatActivity {
                 Drawable placeholder = AppCompatResources.getDrawable(this, R.drawable.no_avatar);
                 Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
             }
-            Functions.initNotifications(this, true);
+            Functions.initNotifications(this);
         }
 
         searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -199,11 +199,7 @@ public class Main extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Menu menu = navigationView.getMenu();
-        if (key != null && sharedPreferences.getBoolean("location_mode", false) && sharedPreferences.getString("location", null) != null) {
-            menu.findItem(R.id.nav_nearby).setVisible(true);
-        } else {
-            menu.findItem(R.id.nav_nearby).setVisible(false);
-        }
+        menu.findItem(R.id.nav_nearby).setVisible(key != null && sharedPreferences.getBoolean("location_mode", false) && sharedPreferences.getString("location", null) != null);
 
         if (key != null && !current.equals(getString(R.string.browse)) && !current.equals(getString(R.string.nearby))) {
             LinearLayout linearLayout = findViewById(R.id.main_placeholder);
