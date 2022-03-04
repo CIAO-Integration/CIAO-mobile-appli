@@ -45,10 +45,12 @@ public class TextFromUrl extends Service implements Runnable {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        path = intent.getStringExtra("path");
-        target = intent.getStringExtra("target");
-        Thread thread = new Thread(this);
-        thread.start();
+        if (intent != null) {
+            path = intent.getStringExtra("path");
+            target = intent.getStringExtra("target");
+            Thread thread = new Thread(this);
+            thread.start();
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
