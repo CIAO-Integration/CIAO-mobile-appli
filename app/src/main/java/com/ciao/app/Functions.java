@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -44,6 +45,7 @@ import com.ciao.app.receiver.RefreshReceiver;
 import com.ciao.app.service.JsonFromUrl;
 import com.ciao.app.service.NotificationJob;
 import com.ciao.app.view.Tag;
+import com.ciao.app.widget.Widget;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -248,6 +250,9 @@ public class Functions {
         database.clear(table);
         database.insertInto(table, rows);
         database.close();
+        if (table.equals(Database.TABLE_NAME)) {
+            updateWidgets(context);
+        }
     }
 
     /**
@@ -453,5 +458,18 @@ public class Functions {
                 .setAutoCancel(true);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify((int) (Math.random() * 1000), builder.build());
+    }
+
+    /**
+     * Update widgets
+     *
+     * @param context Context
+     */
+    public static void updateWidgets(Context context) {
+        Intent intent = new Intent(context, Widget.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int[] ids = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, Widget.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        context.sendBroadcast(intent);
     }
 }

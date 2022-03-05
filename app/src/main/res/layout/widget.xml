@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Theme.CIAO.Widget"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        style="@style/Theme.CIAO.Widget.Text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:text="@string/latest_productions"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/widget.item0"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/widget_item_height">
+
+        <ImageView
+            android:id="@+id/widget.image0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:foreground="@color/widget_dark"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/widget.title0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="start|center_horizontal"
+            android:padding="8dp"
+            android:text="@string/production"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/widget.item1"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/widget_item_height">
+
+        <ImageView
+            android:id="@+id/widget.image1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:foreground="@color/widget_dark"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/widget.title1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="start|center_horizontal"
+            android:padding="8dp"
+            android:text="@string/production"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/widget.item0" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/widget.item2"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/widget_item_height">
+
+        <ImageView
+            android:id="@+id/widget.image2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:foreground="@color/widget_dark"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/widget.title2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="start|center_horizontal"
+            android:padding="8dp"
+            android:text="@string/production"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/widget.item1" />
+    </FrameLayout>
+
+</LinearLayout>

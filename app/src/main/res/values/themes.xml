@@ -77,4 +77,12 @@
         <item name="android:textColor">@color/black</item>
         <item name="android:background">@color/white</item>
     </style>
+
+    <style name="Theme.CIAO.Widget">
+        <item name="android:background">@drawable/background_widget_light</item>
+    </style>
+
+    <style name="Theme.CIAO.Widget.Text">
+        <item name="android:textColor">@color/black</item>
+    </style>
 </resources>

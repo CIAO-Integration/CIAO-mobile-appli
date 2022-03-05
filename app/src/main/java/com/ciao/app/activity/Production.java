@@ -29,15 +29,19 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.preference.PreferenceManager;
 
 import com.ciao.app.ArticleBuilder;
 import com.ciao.app.BuildConfig;
 import com.ciao.app.Database;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
+import com.ciao.app.service.JsonFromUrl;
 import com.ciao.app.service.TextFromUrl;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Activity showing an article
@@ -135,11 +139,27 @@ public class Production extends AppCompatActivity {
                 break;
         }
 
+        String productionId = intent.getStringExtra("productionId");
+
+        Map<String, String> arguments = new HashMap<>();
+        String key = PreferenceManager.getDefaultSharedPreferences(this).getString("key", null);
+        if (key != null) {
+            arguments.put("request", "compulse");
+            arguments.put("key", key);
+        } else {
+            arguments.put("request", "consulte");
+        }
+        arguments.put("id", productionId);
+        Intent intent2 = new Intent(this, JsonFromUrl.class);
+        intent2.putExtra("arguments", (Serializable) arguments);
+        intent2.putExtra("url", BuildConfig.WEB_SERVER_URL);
+        startService(intent2);
+
         progressDialog = Functions.makeLoadingDialog(this);
         progressDialog.show();
 
         Database database = new Database(this);
-        HashMap<String, String> row = database.getRowById(intent.getStringExtra("productionId"));
+        HashMap<String, String> row = database.getRowById(productionId);
         database.close();
 
         type = row.get("type");
