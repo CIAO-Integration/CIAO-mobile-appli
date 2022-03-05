@@ -26,7 +26,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.cardview.widget.CardView;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -135,8 +134,6 @@ public class Production extends AppCompatActivity {
                 share.setColorFilter(Color.WHITE);
                 break;
         }
-        CardView cardView = findViewById(R.id.actionbar_cardview);
-        cardView.setElevation(0);
 
         progressDialog = Functions.makeLoadingDialog(this);
         progressDialog.show();

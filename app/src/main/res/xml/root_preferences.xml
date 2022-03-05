@@ -23,6 +23,11 @@
             app:key="login"
             app:summary="@string/login_register_summary"
             app:title="@string/login_register" />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="avatar"
+            app:summary="@string/change_avatar_summary"
+            app:title="@string/change_avatar" />
         <SwitchPreference
             app:defaultValue="false"
             app:iconSpaceReserved="false"

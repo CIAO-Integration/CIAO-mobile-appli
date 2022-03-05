@@ -62,6 +62,14 @@ import java.util.Map;
  */
 public class Settings extends AppCompatActivity {
     /**
+     * On permission request
+     */
+    private static ActivityResultLauncher<String> requestPermissionLauncher;
+    /**
+     * On file picked
+     */
+    private static ActivityResultLauncher<String> requestFile;
+    /**
      * Target for broadcast receiver
      */
     private final String AVATAR_TARGET = "Avatar";
@@ -74,17 +82,16 @@ public class Settings extends AppCompatActivity {
      */
     private String key;
     /**
-     * On permission request
-     */
-    private ActivityResultLauncher<String> requestPermissionLauncher;
-    /**
-     * On file picked
-     */
-    private ActivityResultLauncher<String> requestFile;
-    /**
      * Progress dialog
      */
     private Dialog progressDialog;
+
+    /**
+     * Open file picker to chose an avatar
+     */
+    public static void chooseAvatar() {
+        requestFile.launch("image/*");
+    }
 
     /**
      * Create Activity
@@ -167,7 +174,7 @@ public class Settings extends AppCompatActivity {
                 if (!avatar.startsWith("http")) {
                     avatar = BuildConfig.STORAGE_SERVER_URL + avatar;
                 }
-                Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+                Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).into(imageView);
             }
 
             String username = sharedPreferences.getString("username", null);
@@ -193,13 +200,6 @@ public class Settings extends AppCompatActivity {
                 }
             });
         }
-    }
-
-    /**
-     * Open file picker to chose an avatar
-     */
-    public void chooseAvatar() {
-        requestFile.launch("image/*");
     }
 
     /**
@@ -323,6 +323,7 @@ public class Settings extends AppCompatActivity {
             Preference authors = findPreference("authors");
             Preference source = findPreference("source");
             Preference version = findPreference("version");
+            Preference avatar = findPreference("avatar");
 
             location.setVisible(sharedPreferences.getBoolean("location_mode", false));
             location.setSummary(sharedPreferences.getString("location", context.getString(R.string.undefined)));
@@ -465,12 +466,26 @@ public class Settings extends AppCompatActivity {
             });
             version.setSummary(BuildConfig.VERSION_NAME);
 
+            avatar.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(@NonNull Preference preference) {
+                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                        chooseAvatar();
+                    } else {
+                        Settings.requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    }
+                    return false;
+                }
+            });
+
             if (key != null) {
                 login.setVisible(false);
+                avatar.setVisible(true);
 
             } else {
                 logout.setVisible(false);
                 location_mode.setVisible(false);
+                avatar.setVisible(false);
             }
         }
 

@@ -41,6 +41,7 @@
         android:transitionName="avatar"
         app:cardBackgroundColor="#00000000"
         app:cardCornerRadius="48dp"
+        app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">

@@ -17,7 +17,8 @@
             android:layout_height="wrap_content"
             android:transitionName="avatar"
             app:cardBackgroundColor="#00000000"
-            app:cardCornerRadius="48dp">
+            app:cardCornerRadius="48dp"
+            app:cardElevation="0dp">
 
             <ImageView
                 android:id="@+id/settings.avatar"

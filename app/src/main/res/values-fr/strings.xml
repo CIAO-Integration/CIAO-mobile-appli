@@ -87,4 +87,6 @@
     <string name="success">Succès</string>
     <string name="authors_summary">GitHub :<b>\n@ChrisB822\n@Klbgr\n@oanikienko\n@Viklaj</b></string>
     <string name="avatar_wrong_format">Veuillez choisir un fichier JPG ou PNG</string>
+    <string name="change_avatar">Changer d\'avatar</string>
+    <string name="change_avatar_summary">Soyez vous-même !</string>
 </resources>
