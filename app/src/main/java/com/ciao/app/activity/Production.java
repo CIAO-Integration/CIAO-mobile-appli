@@ -159,7 +159,7 @@ public class Production extends AppCompatActivity {
             if (pathIsValid) {
                 registerReceiver(new ArticleReceiver(), new IntentFilter(TARGET));
                 Intent intent1 = new Intent(this, TextFromUrl.class);
-                intent1.putExtra("path", BuildConfig.STORAGE_SERVER_URL + path);
+                intent1.putExtra("url", BuildConfig.STORAGE_SERVER_URL + path);
                 intent1.putExtra("target", TARGET);
                 startService(intent1);
             } else {
@@ -293,7 +293,7 @@ public class Production extends AppCompatActivity {
         /**
          * Context
          */
-        private Context context;
+        private final Context context;
 
         /**
          * Constructor

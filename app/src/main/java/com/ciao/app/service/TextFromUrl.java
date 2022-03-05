@@ -17,7 +17,7 @@ public class TextFromUrl extends Service implements Runnable {
     /**
      * Path of text file
      */
-    private String path;
+    private String url;
     /**
      * Target for Broadcast receiver
      */
@@ -46,7 +46,7 @@ public class TextFromUrl extends Service implements Runnable {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
-            path = intent.getStringExtra("path");
+            url = intent.getStringExtra("url");
             target = intent.getStringExtra("target");
             Thread thread = new Thread(this);
             thread.start();
@@ -61,7 +61,7 @@ public class TextFromUrl extends Service implements Runnable {
     public void run() {
         Intent intent = new Intent(target);
         try {
-            URL url = new URL(path);
+            URL url = new URL(this.url);
             Scanner scanner = new Scanner(url.openStream());
             StringBuilder text = new StringBuilder();
             while (scanner.hasNextLine()) {

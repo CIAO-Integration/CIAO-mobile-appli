@@ -12,13 +12,16 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -36,10 +39,17 @@ import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.ciao.app.service.Gps;
+import com.ciao.app.service.ImageUploader;
 import com.ciao.app.service.JsonFromUrl;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,6 +62,10 @@ import java.util.Map;
  */
 public class Settings extends AppCompatActivity {
     /**
+     * Target for broadcast receiver
+     */
+    private final String AVATAR_TARGET = "Avatar";
+    /**
      * Shared preferences
      */
     private SharedPreferences sharedPreferences;
@@ -59,6 +73,18 @@ public class Settings extends AppCompatActivity {
      * API key
      */
     private String key;
+    /**
+     * On permission request
+     */
+    private ActivityResultLauncher<String> requestPermissionLauncher;
+    /**
+     * On file picked
+     */
+    private ActivityResultLauncher<String> requestFile;
+    /**
+     * Progress dialog
+     */
+    private Dialog progressDialog;
 
     /**
      * Create Activity
@@ -72,6 +98,59 @@ public class Settings extends AppCompatActivity {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         key = sharedPreferences.getString("key", null);
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                Snackbar.make(findViewById(android.R.id.content), getString(R.string.perm_granted), Snackbar.LENGTH_SHORT).show();
+                chooseAvatar();
+            } else {
+                Snackbar.make(findViewById(android.R.id.content), getString(R.string.perm_denied), Snackbar.LENGTH_SHORT).show();
+            }
+        });
+        requestFile = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
+            @Override
+            public void onActivityResult(Uri result) {
+                if (result != null) {
+                    String type = getContentResolver().getType(result);
+                    if (type.equals("image/png") || type.equals("image/jpeg")) {
+                        String extension = null;
+                        if (type.equals("image/png")) {
+                            extension = "png";
+                        } else if (type.equals("image/jpeg")) {
+                            extension = "jpg";
+                        }
+                        try {
+                            InputStream inputStream = getContentResolver().openInputStream(result);
+                            OutputStream outputStream = new FileOutputStream(getFilesDir() + "/avatar." + extension);
+                            byte[] buffer = new byte[1024];
+                            int length;
+                            while ((length = inputStream.read(buffer)) > 0) {
+                                outputStream.write(buffer, 0, length);
+                            }
+                            outputStream.close();
+                            inputStream.close();
+
+                            progressDialog = Functions.makeLoadingDialog(Settings.this);
+                            progressDialog.show();
+                            registerReceiver(new AvatarReceiver(), new IntentFilter(AVATAR_TARGET));
+                            Map<String, String> arguments = new HashMap<>();
+                            arguments.put("request", "avatar");
+                            arguments.put("key", key);
+                            Intent intent = new Intent(Settings.this, ImageUploader.class);
+                            intent.putExtra("arguments", (Serializable) arguments);
+                            intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
+                            intent.putExtra("path", getFilesDir() + "/avatar." + extension);
+                            intent.putExtra("target", AVATAR_TARGET);
+                            startService(intent);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Functions.makeDialog(Settings.this, getString(R.string.error), e.toString()).show();
+                        }
+                    } else {
+                        Functions.makeDialog(Settings.this, getString(R.string.error), getString(R.string.avatar_wrong_format)).show();
+                    }
+                }
+            }
+        });
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -102,7 +181,25 @@ public class Settings extends AppCompatActivity {
                 TextView textView = findViewById(R.id.settings_email);
                 textView.setText(email);
             }
+
+            findViewById(R.id.settings_avatar).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (ContextCompat.checkSelfPermission(Settings.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                        chooseAvatar();
+                    } else {
+                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    }
+                }
+            });
         }
+    }
+
+    /**
+     * Open file picker to chose an avatar
+     */
+    public void chooseAvatar() {
+        requestFile.launch("image/*");
     }
 
     /**
@@ -447,6 +544,40 @@ public class Settings extends AppCompatActivity {
                 } else {
                     progressDialog.cancel();
                     Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_gps)).show();
+                }
+            }
+        }
+    }
+
+    /**
+     * Broadcast receiver fro ImageUploader
+     */
+    private class AvatarReceiver extends BroadcastReceiver {
+        /**
+         * On receive
+         *
+         * @param context Context
+         * @param intent  Intent
+         */
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            unregisterReceiver(this);
+            if (intent.getStringExtra("json") != null) {
+                try {
+                    JSONObject json = new JSONObject(intent.getStringExtra("json"));
+                    String status = json.getString("status");
+                    if (status.equals("200")) {
+                        progressDialog.cancel();
+                        finishAffinity();
+                        startActivity(new Intent(context, Loading.class));
+                    } else {
+                        progressDialog.cancel();
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_message, status, json.getString("message"))).show();
+                    }
+                } catch (JSONException e) {
+                    progressDialog.cancel();
+                    e.printStackTrace();
+                    Functions.makeDialog(context, getString(R.string.error), e.toString()).show();
                 }
             }
         }

@@ -86,4 +86,5 @@
     <string name="author">Auteur : %1$s</string>
     <string name="success">Succès</string>
     <string name="authors_summary">GitHub :<b>\n@ChrisB822\n@Klbgr\n@oanikienko\n@Viklaj</b></string>
+    <string name="avatar_wrong_format">Veuillez choisir un fichier JPG ou PNG</string>
 </resources>

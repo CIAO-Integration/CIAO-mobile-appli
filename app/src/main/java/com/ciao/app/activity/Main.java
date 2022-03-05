@@ -45,6 +45,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.signature.ObjectKey;
 import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
@@ -181,7 +182,7 @@ public class Main extends AppCompatActivity {
                     avatar = BuildConfig.STORAGE_SERVER_URL + avatar;
                 }
                 Drawable placeholder = AppCompatResources.getDrawable(this, R.drawable.no_avatar);
-                Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+                Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).signature(new ObjectKey(System.currentTimeMillis())).into(imageView);
             }
             Functions.initNotifications(this);
         }
