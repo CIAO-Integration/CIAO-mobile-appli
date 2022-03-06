@@ -472,4 +472,18 @@ public class Functions {
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
         context.sendBroadcast(intent);
     }
+
+    /**
+     * Generate a random visit id
+     *
+     * @return Random visit id
+     */
+    public static String generateVisitId() {
+        String chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+        StringBuilder id = new StringBuilder("app");
+        for (int i = 3; i < 32; i++) {
+            id.append(chars.charAt((int) (Math.random() * chars.length())));
+        }
+        return id.toString();
+    }
 }

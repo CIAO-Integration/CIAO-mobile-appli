@@ -30,14 +30,17 @@
             android:layout_gravity="center"
             android:adjustViewBounds="true"
             android:foreground="@color/widget_dark"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/no_image" />
 
         <TextView
             android:id="@+id/widget.title0"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:ellipsize="end"
             android:gravity="start|center_horizontal"
+            android:maxLines="1"
             android:padding="8dp"
             android:text="@string/production"
             android:textColor="#ffffff"
@@ -61,14 +64,17 @@
             android:layout_gravity="center"
             android:adjustViewBounds="true"
             android:foreground="@color/widget_dark"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/no_image" />
 
         <TextView
             android:id="@+id/widget.title1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:ellipsize="end"
             android:gravity="start|center_horizontal"
+            android:maxLines="1"
             android:padding="8dp"
             android:text="@string/production"
             android:textColor="#ffffff"
@@ -91,14 +97,17 @@
             android:layout_gravity="center"
             android:adjustViewBounds="true"
             android:foreground="@color/widget_dark"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/no_image" />
 
         <TextView
             android:id="@+id/widget.title2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:ellipsize="end"
             android:gravity="start|center_horizontal"
+            android:maxLines="1"
             android:padding="8dp"
             android:text="@string/production"
             android:textColor="#ffffff"

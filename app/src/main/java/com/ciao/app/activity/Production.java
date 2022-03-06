@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -51,6 +52,14 @@ public class Production extends AppCompatActivity {
      * Target for broadcast receiver
      */
     public static final String TARGET = "Production";
+    /**
+     * Shared preferences
+     */
+    private SharedPreferences sharedPreferences;
+    /**
+     * Shared preferences editor
+     */
+    private SharedPreferences.Editor editor;
     /**
      * Type of production
      */
@@ -104,6 +113,9 @@ public class Production extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_production);
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = sharedPreferences.edit();
+
         videoView = findViewById(R.id.production_video);
         fullscreen = findViewById(R.id.production_fullscreen);
         content = findViewById(R.id.production_content);
@@ -148,6 +160,13 @@ public class Production extends AppCompatActivity {
             arguments.put("key", key);
         } else {
             arguments.put("request", "consulte");
+            String visit_id = sharedPreferences.getString("visit_id", null);
+            if (visit_id == null) {
+                visit_id = Functions.generateVisitId();
+                editor.putString("visit_id", visit_id);
+                editor.apply();
+            }
+            arguments.put("visit_id", visit_id);
         }
         arguments.put("id", productionId);
         Intent intent2 = new Intent(this, JsonFromUrl.class);
