@@ -48,9 +48,11 @@ public class Gps extends Service {
     @SuppressLint("MissingPermission")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        target = intent.getStringExtra("target");
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new MyLocationListener());
+        if (intent != null) {
+            target = intent.getStringExtra("target");
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new MyLocationListener());
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 

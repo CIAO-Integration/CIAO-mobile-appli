@@ -174,7 +174,7 @@ public class Settings extends AppCompatActivity {
                 if (!avatar.startsWith("http")) {
                     avatar = BuildConfig.STORAGE_SERVER_URL + avatar;
                 }
-                Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).into(imageView);
+                Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
             }
 
             String username = sharedPreferences.getString("username", null);

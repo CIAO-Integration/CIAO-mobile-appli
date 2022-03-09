@@ -181,7 +181,7 @@ public class Main extends AppCompatActivity {
                     avatar = BuildConfig.STORAGE_SERVER_URL + avatar;
                 }
                 Drawable placeholder = AppCompatResources.getDrawable(this, R.drawable.no_avatar);
-                Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).into(imageView);
+                Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
             }
             Functions.initNotifications(this);
         }
