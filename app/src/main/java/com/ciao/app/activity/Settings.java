@@ -583,8 +583,8 @@ public class Settings extends AppCompatActivity {
                     String status = json.getString("status");
                     if (status.equals("200")) {
                         progressDialog.cancel();
-                        finishAffinity();
-                        startActivity(new Intent(context, Loading.class));
+                        Glide.get(Settings.this).clearMemory();
+                        Functions.makeDialog(context, getString(R.string.success), getString(R.string.avatar_success)).show();
                     } else {
                         progressDialog.cancel();
                         Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_message, status, json.getString("message"))).show();

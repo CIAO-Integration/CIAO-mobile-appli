@@ -91,4 +91,5 @@
     <string name="change_avatar_summary">Soyez vous-même !</string>
     <string name="production">Production</string>
     <string name="latest_productions">Dernières productions</string>
+    <string name="avatar_success">Veuillez redémarrer CIAO pour appliquer les changements</string>
 </resources>

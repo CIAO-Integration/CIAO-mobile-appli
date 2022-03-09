@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Pair;
 
 import androidx.annotation.Nullable;
@@ -111,6 +112,12 @@ public class Loading extends AppCompatActivity {
                         Functions.storeTimeline(context, array, Database.TABLE_NAME);
                         ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(Loading.this, new Pair<>(findViewById(R.id.loading_logo), "logo"));
                         startActivity(new Intent(context, Main.class), activityOptions.toBundle());
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        }, 500);
                         finish();
                     } else {
                         Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_message, status, json.getString("message"))).show();
