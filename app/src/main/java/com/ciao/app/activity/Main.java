@@ -464,7 +464,7 @@ public class Main extends AppCompatActivity {
                                                         name = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_TITLE));
                                                     }
                                                     try {
-                                                        Thread.sleep(100);
+                                                        Thread.sleep(10);
                                                     } catch (InterruptedException e) {
                                                         e.printStackTrace();
                                                     }
