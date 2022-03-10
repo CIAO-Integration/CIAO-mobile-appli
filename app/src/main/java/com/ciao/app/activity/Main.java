@@ -93,6 +93,10 @@ public class Main extends AppCompatActivity {
      */
     private String name;
     /**
+     * New filename
+     */
+    private String new_name;
+    /**
      * Current fragment
      */
     private String current;
@@ -461,7 +465,7 @@ public class Main extends AppCompatActivity {
                                                     progressBar.setProgress(progress);
                                                     percentage.setText(progress + "%");
                                                     if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
-                                                        name = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_TITLE));
+                                                        new_name = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_TITLE));
                                                     }
                                                     try {
                                                         Thread.sleep(10);
@@ -510,8 +514,14 @@ public class Main extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             unregisterReceiver(this);
             progressDialog.cancel();
+            String filename;
+            if (new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), new_name).exists()) {
+                filename = new_name;
+            } else {
+                filename = name;
+            }
             Intent intent1 = new Intent(Intent.ACTION_VIEW);
-            intent1.setDataAndType(FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), name)), "application/vnd.android.package-archive");
+            intent1.setDataAndType(FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename)), "application/vnd.android.package-archive");
             intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent1);
         }
