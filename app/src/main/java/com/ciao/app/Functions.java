@@ -52,9 +52,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -133,22 +132,18 @@ public class Functions {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Main.RecyclerViewAdapter recyclerViewAdapter = (Main.RecyclerViewAdapter) recyclerView.getAdapter();
                 ArrayList<HashMap<String, String>> data = recyclerViewAdapter.getData();
-
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 switch (position) {
                     case 0:
                         Collections.sort(data, new Comparator<HashMap<String, String>>() {
                             @Override
                             public int compare(HashMap<String, String> o1, HashMap<String, String> o2) {
-                                long date1 = 0;
-                                long date2 = 0;
-                                try {
-                                    date1 = simpleDateFormat.parse(o1.get("date")).getTime();
-                                    date2 = simpleDateFormat.parse(o2.get("date")).getTime();
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                                return (int) (date2 - date1);
+                                int[] date1 = stringToInt(o1.get("date").split("-"));
+                                int[] date2 = stringToInt(o2.get("date").split("-"));
+                                Calendar calendar1 = Calendar.getInstance();
+                                calendar1.set(date1[0], date1[1], date1[2], 0, 0, 0);
+                                Calendar calendar2 = Calendar.getInstance();
+                                calendar1.set(date2[0], date2[1], date2[2], 0, 0, 0);
+                                return (int) (calendar2.getTimeInMillis() - calendar1.getTimeInMillis());
                             }
                         });
                         break;
@@ -156,15 +151,13 @@ public class Functions {
                         Collections.sort(data, new Comparator<HashMap<String, String>>() {
                             @Override
                             public int compare(HashMap<String, String> o1, HashMap<String, String> o2) {
-                                long date1 = 0;
-                                long date2 = 0;
-                                try {
-                                    date1 = simpleDateFormat.parse(o1.get("date")).getTime();
-                                    date2 = simpleDateFormat.parse(o2.get("date")).getTime();
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                                return (int) (date1 - date2);
+                                int[] date1 = stringToInt(o1.get("date").split("-"));
+                                int[] date2 = stringToInt(o2.get("date").split("-"));
+                                Calendar calendar1 = Calendar.getInstance();
+                                calendar1.set(date1[0], date1[1], date1[2], 0, 0, 0);
+                                Calendar calendar2 = Calendar.getInstance();
+                                calendar1.set(date2[0], date2[1], date2[2], 0, 0, 0);
+                                return (int) (calendar1.getTimeInMillis() - calendar2.getTimeInMillis());
                             }
                         });
                         break;
