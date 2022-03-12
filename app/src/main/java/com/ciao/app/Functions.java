@@ -51,6 +51,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -478,5 +479,24 @@ public class Functions {
             id.append(chars.charAt((int) (Math.random() * chars.length())));
         }
         return id.toString();
+    }
+
+    /**
+     * Delete a directory
+     *
+     * @param directory Directory
+     */
+    public static void deleteDirectory(File directory) {
+        if (directory != null && directory.exists()) {
+            if (directory.isDirectory()) {
+                String[] files = directory.list();
+                for (String file : files) {
+                    deleteDirectory(new File(directory, file));
+                }
+                directory.delete();
+            } else if (directory.isFile()) {
+                directory.delete();
+            }
+        }
     }
 }

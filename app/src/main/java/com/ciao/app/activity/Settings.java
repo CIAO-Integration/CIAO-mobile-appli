@@ -583,7 +583,7 @@ public class Settings extends AppCompatActivity {
                     String status = json.getString("status");
                     if (status.equals("200")) {
                         progressDialog.cancel();
-                        Glide.get(Settings.this).clearMemory();
+                        Functions.deleteDirectory(getCacheDir());
                         Functions.makeDialog(context, getString(R.string.success), getString(R.string.avatar_success)).show();
                     } else {
                         progressDialog.cancel();
