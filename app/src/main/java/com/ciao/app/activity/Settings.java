@@ -144,7 +144,7 @@ public class Settings extends AppCompatActivity {
                             arguments.put("key", key);
                             Intent intent = new Intent(Settings.this, ImageUploader.class);
                             intent.putExtra("arguments", (Serializable) arguments);
-                            intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
+                            intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
                             intent.putExtra("path", getFilesDir() + "/avatar." + extension);
                             intent.putExtra("target", AVATAR_TARGET);
                             startService(intent);
@@ -172,7 +172,7 @@ public class Settings extends AppCompatActivity {
                 ImageView imageView = findViewById(R.id.settings_avatar);
                 Drawable placeholder = AppCompatResources.getDrawable(this, R.drawable.no_avatar);
                 if (!avatar.startsWith("http")) {
-                    avatar = BuildConfig.STORAGE_SERVER_URL + avatar;
+                    avatar = getString(R.string.STORAGE_SERVER_URL) + avatar;
                 }
                 Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
             }
@@ -308,7 +308,7 @@ public class Settings extends AppCompatActivity {
                                     arguments.put("key", sharedPreferences.getString("key", null));
                                     Intent intent = new Intent(context, JsonFromUrl.class);
                                     intent.putExtra("arguments", (Serializable) arguments);
-                                    intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
+                                    intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
                                     context.startService(intent);
                                 }
                             }
@@ -367,7 +367,7 @@ public class Settings extends AppCompatActivity {
                                             arguments.put("key", key);
                                             Intent intent = new Intent(context, JsonFromUrl.class);
                                             intent.putExtra("arguments", (Serializable) arguments);
-                                            intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
+                                            intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
                                             context.startService(intent);
                                         }
                                     });
@@ -422,7 +422,7 @@ public class Settings extends AppCompatActivity {
                     arguments.put("key", key);
                     Intent intent = new Intent(context, JsonFromUrl.class);
                     intent.putExtra("arguments", (Serializable) arguments);
-                    intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
+                    intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
                     context.startService(intent);
 
                     startActivity(new Intent(getContext(), Main.class));
@@ -549,7 +549,7 @@ public class Settings extends AppCompatActivity {
                         arguments.put("key", key);
                         Intent intent1 = new Intent(context, JsonFromUrl.class);
                         intent1.putExtra("arguments", (Serializable) arguments);
-                        intent1.putExtra("url", BuildConfig.WEB_SERVER_URL);
+                        intent1.putExtra("url", getString(R.string.WEB_SERVER_URL));
                         context.startService(intent1);
                     } catch (IOException e) {
                         e.printStackTrace();

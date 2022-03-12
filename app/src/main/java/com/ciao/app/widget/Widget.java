@@ -10,7 +10,6 @@ import android.widget.RemoteViews;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.AppWidgetTarget;
-import com.ciao.app.BuildConfig;
 import com.ciao.app.Database;
 import com.ciao.app.R;
 import com.ciao.app.activity.Production;
@@ -49,7 +48,7 @@ public class Widget extends AppWidgetProvider {
                     HashMap<String, String> row = rows.get(i);
                     String url = row.get("thumbnail");
                     if (!url.startsWith("http")) {
-                        url = BuildConfig.STORAGE_SERVER_URL + url;
+                        url = context.getString(R.string.STORAGE_SERVER_URL) + url;
                     }
                     Intent intent = new Intent(context, Production.class);
                     intent.putExtra("productionId", row.get("id"));

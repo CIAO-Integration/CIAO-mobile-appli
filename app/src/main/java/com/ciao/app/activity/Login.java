@@ -19,7 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
-import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
 import com.ciao.app.service.JsonFromUrl;
@@ -237,7 +236,7 @@ public class Login extends AppCompatActivity {
             Intent intent = new Intent(this, JsonFromUrl.class);
             intent.putExtra("arguments", (Serializable) arguments);
             intent.putExtra("target", TARGET);
-            intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
+            intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
             startService(intent);
             progressDialog = Functions.makeLoadingDialog(this);
             progressDialog.show();
@@ -278,7 +277,7 @@ public class Login extends AppCompatActivity {
                 Intent intent = new Intent(this, JsonFromUrl.class);
                 intent.putExtra("arguments", (Serializable) arguments);
                 intent.putExtra("target", TARGET);
-                intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
+                intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
                 startService(intent);
                 progressDialog = Functions.makeLoadingDialog(this);
                 progressDialog.show();

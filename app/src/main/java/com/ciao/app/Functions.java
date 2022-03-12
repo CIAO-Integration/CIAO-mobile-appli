@@ -211,7 +211,7 @@ public class Functions {
         Intent intent = new Intent(activity, JsonFromUrl.class);
         intent.putExtra("arguments", (Serializable) arguments);
         intent.putExtra("target", target);
-        intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
+        intent.putExtra("url", activity.getString(R.string.WEB_SERVER_URL));
         activity.startService(intent);
     }
 

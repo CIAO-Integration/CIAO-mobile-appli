@@ -13,7 +13,6 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.cardview.widget.CardView;
 import androidx.preference.PreferenceManager;
 
-import com.ciao.app.BuildConfig;
 import com.ciao.app.R;
 import com.ciao.app.service.JsonFromUrl;
 
@@ -124,7 +123,7 @@ public class Tag extends CardView {
         arguments.put("key", key);
         Intent intent = new Intent(context, JsonFromUrl.class);
         intent.putExtra("arguments", (Serializable) arguments);
-        intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
+        intent.putExtra("url", context.getString(R.string.WEB_SERVER_URL));
         context.startService(intent);
 
         update();

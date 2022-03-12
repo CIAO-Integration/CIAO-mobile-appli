@@ -17,8 +17,9 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "WEB_SERVER_URL", properties.getProperty("WEB_SERVER_URL"))
-        buildConfigField("String", "STORAGE_SERVER_URL", properties.getProperty("STORAGE_SERVER_URL"))
+        resValue("string", "WEB_SERVER_URL", properties.getProperty("WEB_SERVER_URL"))
+        resValue("string", "STORAGE_SERVER_URL", properties.getProperty("STORAGE_SERVER_URL"))
+        resValue("string", "WEB_SERVER_HOST", properties.getProperty("WEB_SERVER_HOST"))
     }
 
     buildTypes {

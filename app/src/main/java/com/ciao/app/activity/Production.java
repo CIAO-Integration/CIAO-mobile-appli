@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -33,7 +34,6 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.preference.PreferenceManager;
 
 import com.ciao.app.ArticleBuilder;
-import com.ciao.app.BuildConfig;
 import com.ciao.app.Database;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
@@ -105,8 +105,11 @@ public class Production extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Intent intent = getIntent();
+        Uri data = intent.getData();
+        String action = intent.getAction();
 
-        if (intent.getBooleanExtra("external", false)) {
+        boolean openLink = action != null && action.equals(Intent.ACTION_VIEW) && data != null;
+        if (intent.getBooleanExtra("external", false) || openLink) {
             Functions.setTheme(this);
         }
 
@@ -151,7 +154,12 @@ public class Production extends AppCompatActivity {
                 break;
         }
 
-        String productionId = intent.getStringExtra("productionId");
+        String productionId;
+        if (openLink) {
+            productionId = data.toString().split("=")[1];
+        } else {
+            productionId = intent.getStringExtra("productionId");
+        }
 
         Map<String, String> arguments = new HashMap<>();
         String key = PreferenceManager.getDefaultSharedPreferences(this).getString("key", null);
@@ -171,7 +179,7 @@ public class Production extends AppCompatActivity {
         arguments.put("id", productionId);
         Intent intent2 = new Intent(this, JsonFromUrl.class);
         intent2.putExtra("arguments", (Serializable) arguments);
-        intent2.putExtra("url", BuildConfig.WEB_SERVER_URL);
+        intent2.putExtra("url", getString(R.string.WEB_SERVER_URL));
         startService(intent2);
 
         progressDialog = Functions.makeLoadingDialog(this);
@@ -195,7 +203,7 @@ public class Production extends AppCompatActivity {
             if (pathIsValid) {
                 registerReceiver(new ArticleReceiver(), new IntentFilter(TARGET));
                 Intent intent1 = new Intent(this, TextFromUrl.class);
-                intent1.putExtra("url", BuildConfig.STORAGE_SERVER_URL + path);
+                intent1.putExtra("url", getString(R.string.STORAGE_SERVER_URL) + path);
                 intent1.putExtra("target", TARGET);
                 startService(intent1);
             } else {
@@ -207,7 +215,7 @@ public class Production extends AppCompatActivity {
             videoView.setVisibility(View.VISIBLE);
             if (pathIsValid) {
                 if (!path.startsWith("http")) {
-                    path = BuildConfig.STORAGE_SERVER_URL + path;
+                    path = getString(R.string.STORAGE_SERVER_URL) + path;
                 }
                 videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override

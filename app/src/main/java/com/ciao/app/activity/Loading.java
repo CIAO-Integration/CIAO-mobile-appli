@@ -14,7 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
-import com.ciao.app.BuildConfig;
 import com.ciao.app.Database;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
@@ -79,7 +78,7 @@ public class Loading extends AppCompatActivity {
                     Intent intent = new Intent(this, JsonFromUrl.class);
                     intent.putExtra("arguments", (Serializable) arguments);
                     intent.putExtra("target", USERINFO_TARGET);
-                    intent.putExtra("url", BuildConfig.WEB_SERVER_URL);
+                    intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
                     startService(intent);
                 } else {
                     Functions.refreshTimeline(this, new TimelineReceiver(), TIMELINE_TARGET);

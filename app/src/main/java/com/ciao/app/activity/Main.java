@@ -182,7 +182,7 @@ public class Main extends AppCompatActivity {
             if (avatar != null && !avatar.equals("null")) {
                 ImageView imageView = findViewById(R.id.actionbar_avatar);
                 if (!avatar.startsWith("http")) {
-                    avatar = BuildConfig.STORAGE_SERVER_URL + avatar;
+                    avatar = getString(R.string.STORAGE_SERVER_URL) + avatar;
                 }
                 Drawable placeholder = AppCompatResources.getDrawable(this, R.drawable.no_avatar);
                 Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
@@ -310,7 +310,7 @@ public class Main extends AppCompatActivity {
             if (data.get(position).get("thumbnail") != null) {
                 String source = data.get(position).get("thumbnail");
                 if (!source.startsWith("http")) {
-                    source = BuildConfig.STORAGE_SERVER_URL + source;
+                    source = activity.getString(R.string.STORAGE_SERVER_URL) + source;
                 }
                 Drawable placeholder = AppCompatResources.getDrawable(activity, R.drawable.no_image);
                 Glide.with(activity).load(source).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.image);

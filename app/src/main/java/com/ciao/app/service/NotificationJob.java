@@ -14,7 +14,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.ciao.app.BuildConfig;
 import com.ciao.app.Database;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
@@ -43,7 +42,7 @@ public class NotificationJob extends JobService {
         if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("key", null) != null) {
             Map<String, String> arguments = new HashMap();
             arguments.put("request", "timeline");
-            String url = BuildConfig.WEB_SERVER_URL;
+            String url = getString(R.string.WEB_SERVER_URL);
 
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {

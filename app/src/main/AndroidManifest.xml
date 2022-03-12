@@ -42,7 +42,32 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activity.Production"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="@string/WEB_SERVER_HOST"
+                    android:pathPrefix="/article.php"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="@string/WEB_SERVER_HOST"
+                    android:pathPrefix="/video.php"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".activity.Login"
             android:screenOrientation="portrait" />
