@@ -143,7 +143,7 @@ public class Functions {
                                 Calendar calendar1 = Calendar.getInstance();
                                 calendar1.set(date1[0], date1[1], date1[2], 0, 0, 0);
                                 Calendar calendar2 = Calendar.getInstance();
-                                calendar1.set(date2[0], date2[1], date2[2], 0, 0, 0);
+                                calendar2.set(date2[0], date2[1], date2[2], 0, 0, 0);
                                 return (int) (calendar2.getTimeInMillis() - calendar1.getTimeInMillis());
                             }
                         });
@@ -157,7 +157,7 @@ public class Functions {
                                 Calendar calendar1 = Calendar.getInstance();
                                 calendar1.set(date1[0], date1[1], date1[2], 0, 0, 0);
                                 Calendar calendar2 = Calendar.getInstance();
-                                calendar1.set(date2[0], date2[1], date2[2], 0, 0, 0);
+                                calendar2.set(date2[0], date2[1], date2[2], 0, 0, 0);
                                 return (int) (calendar1.getTimeInMillis() - calendar2.getTimeInMillis());
                             }
                         });
