@@ -64,7 +64,7 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activity.Production"
-            android:configChanges="orientation|screenSize"></activity>
+            android:configChanges="orientation|screenSize" />
 
         <activity
             android:name=".activity.Login"

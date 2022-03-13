@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -95,6 +96,10 @@ public class Production extends AppCompatActivity {
      * Author
      */
     private String author;
+    /**
+     * Location
+     */
+    private String location;
 
     /**
      * Create Activity
@@ -182,6 +187,8 @@ public class Production extends AppCompatActivity {
         link = row.get("link");
         tags = row.get("tags");
         author = row.get("author");
+        location = row.get("location");
+        Log.d("loc", location);
         TextView actionBarTitle = findViewById(R.id.actionbar_title);
         TextView productionTitle = findViewById(R.id.production_title);
         productionTitle.setText(row.get("title"));
@@ -232,7 +239,7 @@ public class Production extends AppCompatActivity {
                 progressDialog.cancel();
                 Functions.makeDialog(Production.this, getString(R.string.error), getString(R.string.error_video)).show();
             }
-            ArticleBuilder articleBuilder = new ArticleBuilder(Production.this, content, "<p>" + row.get("description") + "</p>", tags, author);
+            ArticleBuilder articleBuilder = new ArticleBuilder(Production.this, content, "<p>" + row.get("description") + "</p>", author, location, tags);
             articleBuilder.build();
         }
 
@@ -312,7 +319,7 @@ public class Production extends AppCompatActivity {
                 progressDialog.cancel();
                 Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_article)).show();
             } else {
-                ArticleBuilder articleBuilder = new ArticleBuilder(context, content, text, tags, author);
+                ArticleBuilder articleBuilder = new ArticleBuilder(context, content, text, author, location, tags);
                 articleBuilder.build();
                 progressDialog.cancel();
             }

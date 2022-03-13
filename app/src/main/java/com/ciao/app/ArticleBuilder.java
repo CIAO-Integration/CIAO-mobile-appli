@@ -99,21 +99,28 @@ public class ArticleBuilder {
      * Author
      */
     private final String author;
+    /**
+     * Location
+     */
+    private final String location;
 
     /**
      * Constructor
      *
-     * @param context Context
-     * @param article Article
-     * @param text    Text
-     * @param tags    Tags
+     * @param context  Context
+     * @param article  Article
+     * @param text     Text
+     * @param author   Author
+     * @param location Location
+     * @param tags     Tags
      */
-    public ArticleBuilder(Context context, LinearLayout article, String text, String tags, String author) {
+    public ArticleBuilder(Context context, LinearLayout article, String text, String author, String location, String tags) {
         this.context = context;
         this.article = article;
         this.text = text;
-        this.tags = tags;
         this.author = author;
+        this.location = location;
+        this.tags = tags;
     }
 
     /**
@@ -179,6 +186,7 @@ public class ArticleBuilder {
             e.printStackTrace();
         }
         buildAuthor();
+        buildLocation();
         buildTags();
     }
 
@@ -276,7 +284,7 @@ public class ArticleBuilder {
         TextView textView = new TextView(context);
         textView.setPadding(0, 8, 0, 4);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, P_SIZE);
-        textView.setText(context.getString(R.string.author, author));
+        textView.setText(context.getString(R.string.production_author, author));
         article.addView(textView);
     }
 
@@ -301,5 +309,16 @@ public class ArticleBuilder {
             }
         }
         article.addView(linearLayout);
+    }
+
+    /**
+     * Build location
+     */
+    public void buildLocation() {
+        TextView textView = new TextView(context);
+        textView.setPadding(0, 8, 0, 4);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, P_SIZE);
+        textView.setText(context.getString(R.string.production_location, location));
+        article.addView(textView);
     }
 }
