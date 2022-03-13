@@ -147,7 +147,8 @@ public class Database extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE title LIKE ? OR tags LIKE ? OR id LIKE ? OR date LIKE ? OR location LIKE ? ORDER BY date DESC";
         ArrayList<HashMap<String, String>> rows = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, new String[]{"%" + search + "%", "%" + search + "%", "%" + search + "%", "%" + search + "%", "%" + search + "%"});
+        String like = "%" + search + "%";
+        Cursor cursor = db.rawQuery(query, new String[]{like, like, like, like, like});
         while (cursor.moveToNext()) {
             HashMap<String, String> row = new HashMap<>();
             row.put("id", cursor.getString(0));

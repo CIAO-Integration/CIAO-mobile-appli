@@ -11,7 +11,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -105,14 +104,9 @@ public class Production extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Intent intent = getIntent();
-        Uri data = intent.getData();
-        String action = intent.getAction();
-
-        boolean openLink = action != null && action.equals(Intent.ACTION_VIEW) && data != null;
-        if (intent.getBooleanExtra("external", false) || openLink) {
+        if (intent.getBooleanExtra("external", false)) {
             Functions.setTheme(this);
         }
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_production);
 
@@ -154,12 +148,7 @@ public class Production extends AppCompatActivity {
                 break;
         }
 
-        String productionId;
-        if (openLink) {
-            productionId = data.toString().split("=")[1];
-        } else {
-            productionId = intent.getStringExtra("productionId");
-        }
+        String productionId = intent.getStringExtra("productionId");
 
         Map<String, String> arguments = new HashMap<>();
         String key = PreferenceManager.getDefaultSharedPreferences(this).getString("key", null);

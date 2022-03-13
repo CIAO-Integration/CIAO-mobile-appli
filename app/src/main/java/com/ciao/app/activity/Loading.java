@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Pair;
@@ -47,6 +48,10 @@ public class Loading extends AppCompatActivity {
      * Shared preferences editor
      */
     private SharedPreferences.Editor editor;
+    /**
+     * Opened from link
+     */
+    private String link;
 
     /**
      * Create Activity
@@ -56,6 +61,14 @@ public class Loading extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        Uri data = intent.getData();
+        String action = intent.getAction();
+
+        if (action != null && action.equals(Intent.ACTION_VIEW) && data != null) {
+            link = data.toString();
+        }
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sharedPreferences.edit();
@@ -75,11 +88,11 @@ public class Loading extends AppCompatActivity {
                     arguments.put("request", "userInfo");
                     arguments.put("key", key);
                     registerReceiver(new UserInfoReceiver(), new IntentFilter(USERINFO_TARGET));
-                    Intent intent = new Intent(this, JsonFromUrl.class);
-                    intent.putExtra("arguments", (Serializable) arguments);
-                    intent.putExtra("target", USERINFO_TARGET);
-                    intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
-                    startService(intent);
+                    Intent intent1 = new Intent(this, JsonFromUrl.class);
+                    intent1.putExtra("arguments", (Serializable) arguments);
+                    intent1.putExtra("target", USERINFO_TARGET);
+                    intent1.putExtra("url", getString(R.string.WEB_SERVER_URL));
+                    startService(intent1);
                 } else {
                     Functions.refreshTimeline(this, new TimelineReceiver(), TIMELINE_TARGET);
                 }
@@ -109,15 +122,18 @@ public class Loading extends AppCompatActivity {
                     if (status.equals("200")) {
                         JSONArray array = json.getJSONArray("list");
                         Functions.storeTimeline(context, array, Database.TABLE_NAME);
+                        Intent intent1 = new Intent(context, Main.class);
+                        if (link != null) {
+                            intent1.putExtra("link", link);
+                        }
                         ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(Loading.this, new Pair<>(findViewById(R.id.loading_logo), "logo"));
-                        startActivity(new Intent(context, Main.class), activityOptions.toBundle());
+                        startActivity(intent1, activityOptions.toBundle());
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 finish();
                             }
                         }, 500);
-                        finish();
                     } else {
                         Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_message, status, json.getString("message"))).show();
                     }

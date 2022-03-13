@@ -36,14 +36,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".activity.Main"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activity.Production"
-            android:configChanges="orientation|screenSize"
-            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -67,6 +59,12 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.Main"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activity.Production"
+            android:configChanges="orientation|screenSize"></activity>
 
         <activity
             android:name=".activity.Login"

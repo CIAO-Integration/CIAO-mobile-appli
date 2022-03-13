@@ -197,6 +197,13 @@ public class Main extends AppCompatActivity {
                 return false;
             }
         });
+
+        String link = getIntent().getStringExtra("link");
+        if (link != null) {
+            Intent intent = new Intent(this, Production.class);
+            intent.putExtra("productionId", link.split("=")[1]);
+            startActivity(intent);
+        }
     }
 
     /**
