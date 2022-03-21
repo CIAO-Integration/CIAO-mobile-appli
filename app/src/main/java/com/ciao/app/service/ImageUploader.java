@@ -93,11 +93,13 @@ public class ImageUploader extends Service implements Runnable {
 
         String[] pathSplit = path.split("/");
         String filename = pathSplit[pathSplit.length - 1];
-        String type;
-        if (filename.contains("png")) {
+        String type = null;
+        if (filename.endsWith(".png")) {
             type = "image/png";
-        } else {
+        } else if (filename.endsWith(".jpg")) {
             type = "image/jpeg";
+        } else if (filename.endsWith((".gif"))) {
+            type = "image/gif";
         }
 
         Intent intent = new Intent(target);

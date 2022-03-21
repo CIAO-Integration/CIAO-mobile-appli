@@ -45,6 +45,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
@@ -185,7 +186,7 @@ public class Main extends AppCompatActivity {
                     avatar = getString(R.string.STORAGE_SERVER_URL) + avatar;
                 }
                 Drawable placeholder = AppCompatResources.getDrawable(this, R.drawable.no_avatar);
-                Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+                Glide.with(this).load(avatar).transition(DrawableTransitionOptions.withCrossFade()).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
             }
             Functions.initNotifications(this);
         }
@@ -320,7 +321,7 @@ public class Main extends AppCompatActivity {
                     source = activity.getString(R.string.STORAGE_SERVER_URL) + source;
                 }
                 Drawable placeholder = AppCompatResources.getDrawable(activity, R.drawable.no_image);
-                Glide.with(activity).load(source).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.image);
+                Glide.with(activity).load(source).transition(DrawableTransitionOptions.withCrossFade()).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.image);
             }
             if (data.get(position).get("type").equals("video")) {
                 holder.image.setForeground(AppCompatResources.getDrawable(activity, android.R.drawable.ic_media_play));

@@ -17,6 +17,7 @@ import androidx.core.text.HtmlCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.ciao.app.view.Tag;
 
 /**
@@ -260,7 +261,7 @@ public class ArticleBuilder {
         imageView.setAdjustViewBounds(true);
         article.addView(imageView);
         Drawable placeholder = AppCompatResources.getDrawable(context, R.drawable.no_image);
-        Glide.with(context).load(src).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+        Glide.with(context).load(src).transition(DrawableTransitionOptions.withCrossFade()).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
     }
 
     /**

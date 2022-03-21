@@ -35,6 +35,7 @@ import androidx.preference.PreferenceManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
@@ -118,12 +119,14 @@ public class Settings extends AppCompatActivity {
             public void onActivityResult(Uri result) {
                 if (result != null) {
                     String type = getContentResolver().getType(result);
-                    if (type.equals("image/png") || type.equals("image/jpeg")) {
+                    if (type.equals("image/png") || type.equals("image/jpeg") || type.equals(("image/gif"))) {
                         String extension = null;
                         if (type.equals("image/png")) {
                             extension = "png";
                         } else if (type.equals("image/jpeg")) {
                             extension = "jpg";
+                        } else if (type.equals("image/gif")) {
+                            extension = "gif";
                         }
                         try {
                             InputStream inputStream = getContentResolver().openInputStream(result);
@@ -174,7 +177,11 @@ public class Settings extends AppCompatActivity {
                 if (!avatar.startsWith("http")) {
                     avatar = getString(R.string.STORAGE_SERVER_URL) + avatar;
                 }
-                Glide.with(this).load(avatar).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+                if (avatar.endsWith(".gif")) {
+                    Glide.with(this).asGif().load(avatar).transition(DrawableTransitionOptions.withCrossFade()).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+                } else {
+                    Glide.with(this).load(avatar).transition(DrawableTransitionOptions.withCrossFade()).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+                }
             }
 
             String username = sharedPreferences.getString("username", null);
@@ -425,7 +432,7 @@ public class Settings extends AppCompatActivity {
                     intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
                     context.startService(intent);
 
-                    startActivity(new Intent(getContext(), Main.class));
+                    startActivity(new Intent(getContext(), Login.class));
                     getActivity().finishAffinity();
                     return false;
                 }
