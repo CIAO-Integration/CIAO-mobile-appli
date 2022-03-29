@@ -207,19 +207,20 @@ public class Database extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE id='" + id + "'";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
-        cursor.moveToNext();
         HashMap<String, String> row = new HashMap<>();
-        row.put("id", cursor.getString(0));
-        row.put("thumbnail", cursor.getString(1));
-        row.put("title", cursor.getString(2));
-        row.put("tags", cursor.getString(3));
-        row.put("date", cursor.getString(4));
-        row.put("location", cursor.getString(5));
-        row.put("type", cursor.getString(6));
-        row.put("path", cursor.getString(7));
-        row.put("link", cursor.getString(8));
-        row.put("description", cursor.getString(9));
-        row.put("author", cursor.getString(10));
+        if (cursor.moveToNext()) {
+            row.put("id", cursor.getString(0));
+            row.put("thumbnail", cursor.getString(1));
+            row.put("title", cursor.getString(2));
+            row.put("tags", cursor.getString(3));
+            row.put("date", cursor.getString(4));
+            row.put("location", cursor.getString(5));
+            row.put("type", cursor.getString(6));
+            row.put("path", cursor.getString(7));
+            row.put("link", cursor.getString(8));
+            row.put("description", cursor.getString(9));
+            row.put("author", cursor.getString(10));
+        }
         cursor.close();
         db.close();
         return row;

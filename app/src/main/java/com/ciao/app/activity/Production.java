@@ -183,73 +183,78 @@ public class Production extends AppCompatActivity {
         HashMap<String, String> row = database.getRowById(productionId);
         database.close();
 
-        type = row.get("type");
-        link = row.get("link");
-        tags = row.get("tags");
-        author = row.get("author");
-        location = row.get("location");
-        Log.d("loc", location);
-        TextView actionBarTitle = findViewById(R.id.actionbar_title);
-        TextView productionTitle = findViewById(R.id.production_title);
-        productionTitle.setText(row.get("title"));
-        String path = row.get("path");
-        boolean pathIsValid = path != null && !path.equals("null") && !path.equals("");
-        if (type.equals("article")) {
-            actionBarTitle.setText(getString(R.string.article));
-            if (pathIsValid) {
-                registerReceiver(new ArticleReceiver(), new IntentFilter(TARGET));
-                Intent intent1 = new Intent(this, TextFromUrl.class);
-                intent1.putExtra("url", getString(R.string.STORAGE_SERVER_URL) + path);
-                intent1.putExtra("target", TARGET);
-                startService(intent1);
-            } else {
-                progressDialog.cancel();
-                Functions.makeDialog(this, getString(R.string.error), getString(R.string.error_article)).show();
-            }
-        } else if (type.equals("video")) {
-            actionBarTitle.setText(getString(R.string.video));
-            videoView.setVisibility(View.VISIBLE);
-            if (pathIsValid) {
-                if (!path.startsWith("http")) {
-                    path = getString(R.string.STORAGE_SERVER_URL) + path;
+        if (!row.isEmpty()) {
+            type = row.get("type");
+            link = row.get("link");
+            tags = row.get("tags");
+            author = row.get("author");
+            location = row.get("location");
+            Log.d("loc", location);
+            TextView actionBarTitle = findViewById(R.id.actionbar_title);
+            TextView productionTitle = findViewById(R.id.production_title);
+            productionTitle.setText(row.get("title"));
+            String path = row.get("path");
+            boolean pathIsValid = path != null && !path.equals("null") && !path.equals("");
+            if (type.equals("article")) {
+                actionBarTitle.setText(getString(R.string.article));
+                if (pathIsValid) {
+                    registerReceiver(new ArticleReceiver(), new IntentFilter(TARGET));
+                    Intent intent1 = new Intent(this, TextFromUrl.class);
+                    intent1.putExtra("url", getString(R.string.STORAGE_SERVER_URL) + path);
+                    intent1.putExtra("target", TARGET);
+                    startService(intent1);
+                } else {
+                    progressDialog.cancel();
+                    Functions.makeDialog(this, getString(R.string.error), getString(R.string.error_article)).show();
                 }
-                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mediaPlayer) {
-                        prepared = true;
-                        MediaController mediaController = new MediaController(Production.this);
-                        videoView.setMediaController(mediaController);
-                        mediaController.setAnchorView(videoView);
-                        progressDialog.cancel();
-                        videoView.start();
+            } else if (type.equals("video")) {
+                actionBarTitle.setText(getString(R.string.video));
+                videoView.setVisibility(View.VISIBLE);
+                if (pathIsValid) {
+                    if (!path.startsWith("http")) {
+                        path = getString(R.string.STORAGE_SERVER_URL) + path;
                     }
-                });
-                videoView.setVideoPath(path);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!prepared) {
+                    videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mediaPlayer) {
+                            prepared = true;
+                            MediaController mediaController = new MediaController(Production.this);
+                            videoView.setMediaController(mediaController);
+                            mediaController.setAnchorView(videoView);
                             progressDialog.cancel();
-                            videoView.suspend();
-                            Functions.makeDialog(Production.this, getString(R.string.error), getString(R.string.error_video)).show();
+                            videoView.start();
                         }
-                    }
-                }, 5000);
-            } else {
-                progressDialog.cancel();
-                Functions.makeDialog(Production.this, getString(R.string.error), getString(R.string.error_video)).show();
+                    });
+                    videoView.setVideoPath(path);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!prepared) {
+                                progressDialog.cancel();
+                                videoView.suspend();
+                                Functions.makeDialog(Production.this, getString(R.string.error), getString(R.string.error_video)).show();
+                            }
+                        }
+                    }, 5000);
+                } else {
+                    progressDialog.cancel();
+                    Functions.makeDialog(Production.this, getString(R.string.error), getString(R.string.error_video)).show();
+                }
+                ArticleBuilder articleBuilder = new ArticleBuilder(Production.this, content, "<p>" + row.get("description") + "</p>", author, location, tags);
+                articleBuilder.build();
             }
-            ArticleBuilder articleBuilder = new ArticleBuilder(Production.this, content, "<p>" + row.get("description") + "</p>", author, location, tags);
-            articleBuilder.build();
-        }
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && type.equals("video")) {
-            WindowInsetsControllerCompat windowInsetsController = ViewCompat.getWindowInsetsController(getWindow().getDecorView());
-            windowInsetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
-            fullscreen.setVisibility(View.VISIBLE);
-            content.removeView(videoView);
-            fullscreen.addView(videoView, 0);
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && type.equals("video")) {
+                WindowInsetsControllerCompat windowInsetsController = ViewCompat.getWindowInsetsController(getWindow().getDecorView());
+                windowInsetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
+                fullscreen.setVisibility(View.VISIBLE);
+                content.removeView(videoView);
+                fullscreen.addView(videoView, 0);
+            }
+        } else {
+            progressDialog.cancel();
+            Functions.makeDialog(this, getString(R.string.error), getString(R.string.production_not_found)).show();
         }
     }
 

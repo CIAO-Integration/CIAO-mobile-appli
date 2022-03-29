@@ -1,5 +1,7 @@
 package com.ciao.app.activity;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+
 import android.Manifest;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -35,7 +37,7 @@ import androidx.preference.PreferenceManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.ciao.app.BuildConfig;
 import com.ciao.app.Functions;
 import com.ciao.app.R;
@@ -177,11 +179,8 @@ public class Settings extends AppCompatActivity {
                 if (!avatar.startsWith("http")) {
                     avatar = getString(R.string.STORAGE_SERVER_URL) + avatar;
                 }
-                if (avatar.endsWith(".gif")) {
-                    Glide.with(this).asGif().load(avatar).transition(DrawableTransitionOptions.withCrossFade()).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
-                } else {
-                    Glide.with(this).load(avatar).transition(DrawableTransitionOptions.withCrossFade()).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
-                }
+                DrawableCrossFadeFactory drawableCrossFadeFactory = new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+                Glide.with(this).load(avatar).transition(withCrossFade(drawableCrossFadeFactory)).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
             }
 
             String username = sharedPreferences.getString("username", null);

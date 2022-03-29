@@ -93,4 +93,5 @@
     <string name="production">Production</string>
     <string name="latest_productions">Dernières productions</string>
     <string name="avatar_success">Veuillez redémarrer CIAO pour appliquer les changements</string>
+    <string name="production_not_found">Production introuvable</string>
 </resources>
