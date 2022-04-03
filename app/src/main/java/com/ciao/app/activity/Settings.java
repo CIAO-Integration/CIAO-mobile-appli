@@ -73,6 +73,10 @@ public class Settings extends AppCompatActivity {
      */
     private static ActivityResultLauncher<String> requestFile;
     /**
+     * Image of easter egg
+     */
+    private static ImageView easterEggImage;
+    /**
      * Target for broadcast receiver
      */
     private final String AVATAR_TARGET = "Avatar";
@@ -94,6 +98,13 @@ public class Settings extends AppCompatActivity {
      */
     public static void chooseAvatar() {
         requestFile.launch("image/*");
+    }
+
+    /**
+     * Show easter egg image
+     */
+    public static void showEasterEgg() {
+        easterEggImage.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -163,6 +174,16 @@ public class Settings extends AppCompatActivity {
                 }
             }
         });
+        easterEggImage = findViewById(R.id.settings_easter_egg);
+        Drawable placeholderEasterEgg = AppCompatResources.getDrawable(this, R.drawable.no_image);
+        DrawableCrossFadeFactory drawableCrossFadeFactory = new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+        Glide.with(this).load(getString(R.string.STORAGE_SERVER_URL) + "ciao.jpg").transition(withCrossFade(drawableCrossFadeFactory)).placeholder(placeholderEasterEgg).error(placeholderEasterEgg).diskCacheStrategy(DiskCacheStrategy.ALL).into(easterEggImage);
+        easterEggImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                easterEggImage.setVisibility(View.GONE);
+            }
+        });
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -179,7 +200,6 @@ public class Settings extends AppCompatActivity {
                 if (!avatar.startsWith("http")) {
                     avatar = getString(R.string.STORAGE_SERVER_URL) + avatar;
                 }
-                DrawableCrossFadeFactory drawableCrossFadeFactory = new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
                 Glide.with(this).load(avatar).transition(withCrossFade(drawableCrossFadeFactory)).placeholder(placeholder).error(placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
             }
 
@@ -463,7 +483,7 @@ public class Settings extends AppCompatActivity {
                     } else if (easterEggCounter == 4) {
                         easterEggDate = null;
                         easterEggCounter = 0;
-                        Functions.openUrl(context, "https://github.com/CIAO-Integration");
+                        showEasterEgg();
                     } else {
                         easterEggCounter++;
                     }
