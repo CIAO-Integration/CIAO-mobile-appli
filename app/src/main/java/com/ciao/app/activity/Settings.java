@@ -11,15 +11,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -218,10 +222,14 @@ public class Settings extends AppCompatActivity {
             findViewById(R.id.settings_avatar).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (ContextCompat.checkSelfPermission(Settings.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                        chooseAvatar();
+                    if (Functions.checkConnection(Settings.this)) {
+                        if (ContextCompat.checkSelfPermission(Settings.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                            chooseAvatar();
+                        } else {
+                            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                        }
                     } else {
-                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                        Functions.makeDialog(Settings.this, getString(R.string.error), getString(R.string.error_network)).show();
                     }
                 }
             });
@@ -236,6 +244,10 @@ public class Settings extends AppCompatActivity {
          * Target for broadcast receiver
          */
         private final String GPS_TARGET = "GPS";
+        /**
+         * Target for broadcast receiver
+         */
+        private final String USERNAME_TARGET = "Username";
         /**
          * Context
          */
@@ -350,71 +362,77 @@ public class Settings extends AppCompatActivity {
             Preference source = findPreference("source");
             Preference version = findPreference("version");
             Preference avatar = findPreference("avatar");
+            Preference username = findPreference("username");
+            Preference cache = findPreference("clear_cache");
 
             location.setVisible(sharedPreferences.getBoolean("location_mode", false));
             location.setSummary(sharedPreferences.getString("location", context.getString(R.string.undefined)));
             location.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(@NonNull Preference preference) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle(getString(R.string.set_location));
-                    builder.setSingleChoiceItems(new CharSequence[]{getString(R.string.gps), getString(R.string.manual)}, 0, null);
-                    builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            int choice = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
-                            switch (choice) {
-                                case 0:
-                                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                                        getLocation();
-                                    } else {
-                                        requestPermissionLauncher.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
-                                    }
-                                    break;
-                                case 1:
-                                    String[] locations = sharedPreferences.getString("locations", "").split(";");
-                                    Spinner spinner = new Spinner(context);
-                                    spinner.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, locations));
-                                    int padding = (int) getResources().getDimension(R.dimen.dialog_padding);
-                                    spinner.setPadding(padding, padding, padding, padding);
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                    builder.setView(spinner);
-                                    builder.setTitle(getString(R.string.set_location));
-                                    builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            String selectedItem = spinner.getSelectedItem().toString();
-                                            editor.putString("location", selectedItem);
-                                            editor.apply();
-                                            location.setSummary(selectedItem);
-                                            Map<String, String> arguments = new HashMap<>();
-                                            arguments.put("request", "location");
-                                            arguments.put("location", selectedItem);
-                                            arguments.put("key", key);
-                                            Intent intent = new Intent(context, JsonFromUrl.class);
-                                            intent.putExtra("arguments", (Serializable) arguments);
-                                            intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
-                                            context.startService(intent);
+                    if (Functions.checkConnection(context)) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle(getString(R.string.set_location));
+                        builder.setSingleChoiceItems(new CharSequence[]{getString(R.string.gps), getString(R.string.manual)}, 0, null);
+                        builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                int choice = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
+                                switch (choice) {
+                                    case 0:
+                                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                            getLocation();
+                                        } else {
+                                            requestPermissionLauncher.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
                                         }
-                                    });
-                                    builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                                    builder.show();
-                                    break;
+                                        break;
+                                    case 1:
+                                        String[] locations = sharedPreferences.getString("locations", "").split(";");
+                                        Spinner spinner = new Spinner(context);
+                                        spinner.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, locations));
+                                        int padding = (int) getResources().getDimension(R.dimen.dialog_padding);
+                                        spinner.setPadding(padding, padding, padding, padding);
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                        builder.setView(spinner);
+                                        builder.setTitle(getString(R.string.set_location));
+                                        builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                String selectedItem = spinner.getSelectedItem().toString();
+                                                editor.putString("location", selectedItem);
+                                                editor.apply();
+                                                location.setSummary(selectedItem);
+                                                Map<String, String> arguments = new HashMap<>();
+                                                arguments.put("request", "location");
+                                                arguments.put("location", selectedItem);
+                                                arguments.put("key", key);
+                                                Intent intent = new Intent(context, JsonFromUrl.class);
+                                                intent.putExtra("arguments", (Serializable) arguments);
+                                                intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
+                                                context.startService(intent);
+                                            }
+                                        });
+                                        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                        builder.show();
+                                        break;
+                                }
                             }
-                        }
-                    });
-                    builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    builder.show();
+                        });
+                        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        builder.show();
+                    } else {
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_network)).show();
+                    }
                     return false;
                 }
             });
@@ -495,11 +513,70 @@ public class Settings extends AppCompatActivity {
             avatar.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(@NonNull Preference preference) {
-                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                        chooseAvatar();
+                    if (Functions.checkConnection(context)) {
+                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                            chooseAvatar();
+                        } else {
+                            Settings.requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                        }
                     } else {
-                        Settings.requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_network)).show();
                     }
+                    return false;
+                }
+            });
+
+            username.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(@NonNull Preference preference) {
+                    if (Functions.checkConnection(context)) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle(R.string.change_username);
+                        EditText editText = new EditText(context);
+                        editText.setTextColor(Color.WHITE);
+                        editText.setHint(R.string.username);
+                        editText.setHintTextColor(getResources().getColor(R.color.text_dark, null));
+                        LinearLayout linearLayout = new LinearLayout(context);
+                        linearLayout.setOrientation(LinearLayout.VERTICAL);
+                        linearLayout.setGravity(Gravity.CENTER);
+                        int padding = (int) context.getResources().getDimension(R.dimen.dialog_padding);
+                        linearLayout.setPadding(padding, padding, padding, padding);
+                        linearLayout.addView(editText);
+                        builder.setView(linearLayout);
+                        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                context.registerReceiver(new UsernameReceiver(), new IntentFilter(USERNAME_TARGET));
+                                Map<String, String> arguments = new HashMap<>();
+                                arguments.put("request", "username");
+                                arguments.put("username", editText.getText().toString());
+                                arguments.put("key", key);
+                                Intent intent = new Intent(context, JsonFromUrl.class);
+                                intent.putExtra("arguments", (Serializable) arguments);
+                                intent.putExtra("target", USERNAME_TARGET);
+                                intent.putExtra("url", getString(R.string.WEB_SERVER_URL));
+                                context.startService(intent);
+                            }
+                        });
+                        builder.show();
+                    } else {
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_network)).show();
+                    }
+                    return false;
+                }
+            });
+
+            cache.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(@NonNull Preference preference) {
+                    Functions.deleteDirectory(context.getCacheDir());
+                    Functions.makeDialog(context, getString(R.string.success), getString(R.string.avatar_success)).show();
                     return false;
                 }
             });
@@ -507,11 +584,13 @@ public class Settings extends AppCompatActivity {
             if (key != null) {
                 login.setVisible(false);
                 avatar.setVisible(true);
+                username.setVisible(true);
 
             } else {
                 logout.setVisible(false);
                 location_mode.setVisible(false);
                 avatar.setVisible(false);
+                username.setVisible(false);
             }
         }
 
@@ -519,29 +598,25 @@ public class Settings extends AppCompatActivity {
          * Get location from GPS sensor
          */
         public void getLocation() {
-            if (Functions.checkConnection(context)) {
-                progressDialog = Functions.makeLoadingDialog(context);
-                progressDialog.show();
-                gpsReceiver = new GpsReceiver();
-                context.registerReceiver(gpsReceiver, new IntentFilter(GPS_TARGET));
-                Intent intent = new Intent(context, Gps.class);
-                intent.putExtra("target", GPS_TARGET);
-                context.startService(intent);
-                loading = true;
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (loading) {
-                            context.unregisterReceiver(gpsReceiver);
-                            progressDialog.cancel();
-                            loading = false;
-                            Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_retry)).show();
-                        }
+            progressDialog = Functions.makeLoadingDialog(context);
+            progressDialog.show();
+            gpsReceiver = new GpsReceiver();
+            context.registerReceiver(gpsReceiver, new IntentFilter(GPS_TARGET));
+            Intent intent = new Intent(context, Gps.class);
+            intent.putExtra("target", GPS_TARGET);
+            context.startService(intent);
+            loading = true;
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (loading) {
+                        context.unregisterReceiver(gpsReceiver);
+                        progressDialog.cancel();
+                        loading = false;
+                        Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_retry)).show();
                     }
-                }, 10000);
-            } else {
-                Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_network)).show();
-            }
+                }
+            }, 10000);
         }
 
         /**
@@ -588,10 +663,42 @@ public class Settings extends AppCompatActivity {
                 }
             }
         }
+
+        /**
+         * Broadcast receiver for JsonFromUrl
+         */
+        private class UsernameReceiver extends BroadcastReceiver {
+            /**
+             * On receive
+             *
+             * @param context Context
+             * @param intent  Intent
+             */
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                context.unregisterReceiver(this);
+                if (intent.getStringExtra("json") != null) {
+                    try {
+                        JSONObject json = new JSONObject(intent.getStringExtra("json"));
+                        String status = json.getString("status");
+                        if (status.equals("200")) {
+                            Functions.makeDialog(context, getString(R.string.success), getString(R.string.avatar_success)).show();
+                        } else if (status.equals("406")) {
+                            Functions.makeDialog(context, getString(R.string.error), getString(R.string.username_not_available)).show();
+                        } else {
+                            Functions.makeDialog(context, getString(R.string.error), getString(R.string.error_message, status, json.getString("message"))).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Functions.makeDialog(context, getString(R.string.error), e.toString()).show();
+                    }
+                }
+            }
+        }
     }
 
     /**
-     * Broadcast receiver fro ImageUploader
+     * Broadcast receiver for ImageUploader
      */
     private class AvatarReceiver extends BroadcastReceiver {
         /**

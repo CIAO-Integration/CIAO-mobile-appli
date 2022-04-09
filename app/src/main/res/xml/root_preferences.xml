@@ -28,6 +28,11 @@
             app:key="avatar"
             app:summary="@string/change_avatar_summary"
             app:title="@string/change_avatar" />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="username"
+            app:summary="@string/change_username_summary"
+            app:title="@string/change_username" />
         <SwitchPreference
             app:defaultValue="false"
             app:iconSpaceReserved="false"
@@ -62,5 +67,14 @@
             app:key="version"
             app:summary=""
             app:title="@string/version" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/advanced">
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="clear_cache"
+            app:summary="@string/clear_cache_summary"
+            app:title="@string/clear_cache" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -94,4 +94,10 @@
     <string name="latest_productions">Latest productions</string>
     <string name="avatar_success">Please restart CIAO to apply changes</string>
     <string name="production_not_found">Production not found</string>
+    <string name="change_username">Change username</string>
+    <string name="change_username_summary">Stay anonymous !</string>
+    <string name="username_not_available">Chosen username is not available</string>
+    <string name="advanced">Advanced</string>
+    <string name="clear_cache">Clear cache</string>
+    <string name="clear_cache_summary">To reload everything</string>
 </resources>

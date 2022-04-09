@@ -27,7 +27,7 @@
     <string name="have_account">Vous avez déjà un compte ?</string>
     <string name="confirm_password">"Confirmer mot de passe "</string>
     <string name="register">Inscription</string>
-    <string name="username">Pseudo</string>
+    <string name="username">Pseudonyme</string>
     <string name="gps">Capteur GPS</string>
     <string name="manual">Manuel</string>
     <string name="application">Application</string>
@@ -66,7 +66,7 @@
     <string name="error_video">Erreur lors du chargement de la vidéo</string>
     <string name="error_article">Erreur lors du chargement de l\'article</string>
     <string name="error_network">Veuillez vérifier votre connexion à internet, puis redémarrez CIAO</string>
-    <string name="not_valid_username">Le pseudo ne peut être vide</string>
+    <string name="not_valid_username">Le pseudonyme ne peut être vide</string>
     <string name="not_valid_email">L\'email doit être de la forme chose@domain.fr</string>
     <string name="not_valid_conf_password">Le mot de passe de confirmation doit être identique au mot de passe</string>
     <string name="not_valid_password">Le mot de passe doit contenir au moins 8 caractères et contenir au moins 1 lettre majuscule, 1 lettre minuscule, 1 chiffre et 1 caractère spécial (!*@#$&amp;)</string>
@@ -94,4 +94,10 @@
     <string name="latest_productions">Dernières productions</string>
     <string name="avatar_success">Veuillez redémarrer CIAO pour appliquer les changements</string>
     <string name="production_not_found">Production introuvable</string>
+    <string name="change_username">Changer de pseudonyme</string>
+    <string name="change_username_summary">Restez anonyme !</string>
+    <string name="username_not_available">Le pseudonyme choisi n\'est pas disponible</string>
+    <string name="advanced">Avancé</string>
+    <string name="clear_cache">Vider le cache</string>
+    <string name="clear_cache_summary">Pour tout rafraîchir</string>
 </resources>
