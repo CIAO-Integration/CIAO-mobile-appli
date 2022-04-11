@@ -144,7 +144,7 @@ public class Functions {
                                 calendar1.set(date1[0], date1[1], date1[2], 0, 0, 0);
                                 Calendar calendar2 = Calendar.getInstance();
                                 calendar2.set(date2[0], date2[1], date2[2], 0, 0, 0);
-                                return (int) (calendar2.getTimeInMillis() - calendar1.getTimeInMillis());
+                                return Long.compare(calendar2.getTimeInMillis(), calendar1.getTimeInMillis());
                             }
                         });
                         break;
@@ -158,7 +158,7 @@ public class Functions {
                                 calendar1.set(date1[0], date1[1], date1[2], 0, 0, 0);
                                 Calendar calendar2 = Calendar.getInstance();
                                 calendar2.set(date2[0], date2[1], date2[2], 0, 0, 0);
-                                return (int) (calendar1.getTimeInMillis() - calendar2.getTimeInMillis());
+                                return Long.compare(calendar1.getTimeInMillis(), calendar2.getTimeInMillis());
                             }
                         });
                         break;
